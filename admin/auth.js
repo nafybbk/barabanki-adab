@@ -10,7 +10,7 @@ const AdminAuth = {
   PASS_KEY: "bazm_admin_password",
 
   getPassword() {
-    return localStorage.getItem(this.PASS_KEY) || "naseer2026"; // default — change on first login
+    return localStorage.getItem(this.PASS_KEY) || "12345678"; // default — change on first login
   },
   setPassword(pw) {
     localStorage.setItem(this.PASS_KEY, pw);

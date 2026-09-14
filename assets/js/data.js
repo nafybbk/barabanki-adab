@@ -69,7 +69,7 @@ const SITE_DATA_DEFAULT = {
 
   books: [
     // Apni PDF se banaye flipbooks — quality Rekhta se behtar hai
-    { id: "aina-e-fikr", title: "Aina-e-Fikr", titleUrdu: "آئینۂ فکر", titleHindi: "आईना-ए-फ़िक्र", year: "", cover: "assets/img/aina-e-fikr-cover.jpg", pdf: "assets/pdf/aina-e-fikr.pdf", description: "Fikr-o-khayal par mabni shayeri ka majmua.", pageCount: 330 },
+    { id: "aina-e-fikr", title: "Aina-e-Fikr", titleUrdu: "آئینۂ فکر", titleHindi: "आईना-ए-फ़िक्र", year: "", cover: "assets/img/aina-e-fikr-cover.jpg", pdf: "assets/pdf/aina-e-fikr.pdf", description: "Fikr-o-khayal par mabni shayeri ka majmua.", pageCount: 330, heyzine: "https://heyzine.com/flip-book/184af4324c.html" },
     { id: "diwan-e-naseer", title: "Deewan-e-Naseer", titleUrdu: "دیوانِ نصیر", titleHindi: "दीवान-ए-नसीर", year: "2023", cover: "assets/img/diwan-e-naseer-cover.jpg", pdf: "assets/pdf/diwan-e-naseer.pdf", description: "Naseer Ansari Barabankvi ka deewan — ghazlon aur nazmon ka majmua.", pageCount: 306, heyzine: "https://heyzine.com/flip-book/b2b56ef91d.html" },
     { id: "zikr-e-karbala", title: "Zikr-e-Karbala", titleUrdu: "ذکرِ کربلا", titleHindi: "ज़िक्र-ए-कर्बला", year: "2024", cover: "assets/img/zikr-e-qarbala-cover.jpg", pdf: "assets/pdf/zikr-e-qarbala.pdf", description: "Karbala ke waqiye par mabni marsiye aur kalaam.", pageCount: 370, heyzine: "https://heyzine.com/flip-book/0746b111f7.html" },
     // In dono ki PDF abhi nahi hai — Rekhta par cover click karne se khulengi

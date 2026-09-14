@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bazm-e-Aziz — Shagird Circle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body data-page="shagird">
+<div class="grain"></div>
+<div id="site-header"></div>
+
+<section class="section" style="padding-bottom:20px;">
+  <div class="eyebrow">Shagird Circle</div>
+  <h1 style="font-size:40px; margin-bottom:14px;">Bazm-e-Aziz</h1>
+  <p class="muted" style="max-width:60ch;">
+    Ye Ustad sahab ke shagirdon aur muhibban-e-sukhan ki apni mehfil hai.
+    Apna naam aur ek PIN chun kar shamil hon, phir apni tehreerein,
+    tasveerein, reels ya links share karein.
+  </p>
+</section>
+
+<!-- ================= AUTH ================= -->
+<section class="section section-tight" id="auth-section" style="padding-top:0;">
+  <div class="auth-box">
+    <div class="compose-tabs">
+      <div class="compose-tab active" data-mode="login">Login</div>
+      <div class="compose-tab" data-mode="register">Naya shamil hon</div>
+    </div>
+
+    <div id="login-form">
+      <h2 style="font-size:22px;">Wapas khush-amdeed</h2>
+      <p class="muted">Apna naam aur PIN daalein</p>
+      <div class="field">
+        <label>Naam</label>
+        <input type="text" id="login-name" placeholder="Apna naam likhein">
+      </div>
+      <div class="field">
+        <label>PIN</label>
+        <input type="password" id="login-pin" class="pin-input" maxlength="6" inputmode="numeric" placeholder="••••">
+      </div>
+      <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="handleLogin()">Login karein</button>
+      <p id="login-error" style="color:#a33; font-size:13px; margin-top:12px; text-align:center;"></p>
+    </div>
+
+    <div id="register-form" style="display:none;">
+      <h2 style="font-size:22px;">Bazm mein shamil hon</h2>
+      <p class="muted">Apna naam aur ek PIN chunein (yaad rakhne ke liye)</p>
+      <div class="field">
+        <label>Naam</label>
+        <input type="text" id="register-name" placeholder="Apna poora naam">
+      </div>
+      <div class="field">
+        <label>PIN banayein (4–6 ank)</label>
+        <input type="password" id="register-pin" class="pin-input" maxlength="6" inputmode="numeric" placeholder="••••">
+      </div>
+      <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="handleRegister()">Shamil hon</button>
+      <p id="register-error" style="color:#a33; font-size:13px; margin-top:12px; text-align:center;"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WALL (shown after login) ================= -->
+<section class="section section-tight" id="wall-section" style="display:none; padding-top:0;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+    <div>
+      <span class="muted">Khush-amdeed,</span>
+      <strong id="current-user-name" style="color:var(--maroon); font-family:var(--font-ui); font-size:18px;"></strong>
+    </div>
+    <button class="btn btn-ghost" onclick="handleLogout()">Logout</button>
+  </div>
+
+  <div class="card" style="margin-bottom:36px;">
+    <div class="compose-tabs">
+      <div class="compose-tab active" data-post-type="text">✍️ Tehreer</div>
+      <div class="compose-tab" data-post-type="image">🖼️ Tasveer</div>
+      <div class="compose-tab" data-post-type="link">🔗 Link</div>
+      <div class="compose-tab" data-post-type="reel">🎬 Reel</div>
+    </div>
+
+    <div class="field" style="margin-top:16px;">
+      <textarea id="post-content-text" rows="4" placeholder="Apni shayeri, khayal, ya tabsera likhein..."></textarea>
+      <input id="post-content-url" type="url" placeholder="URL yahan paste karein (image, link ya reel)" style="display:none; width:100%; padding:12px 14px; font-size:15px; border:1px solid var(--paper-line); border-radius:3px; background:var(--paper); margin-top:8px;">
+    </div>
+    <button class="btn btn-primary" onclick="handlePost()">Share karein</button>
+    <p id="post-error" style="color:#a33; font-size:13px; margin-top:10px;"></p>
+  </div>
+
+  <div class="eyebrow">Bazm ki Mehfil</div>
+  <div id="posts-list"></div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="../assets/js/data.js?v=8"></script>
+<script src="../assets/js/components.js?v=8"></script>
+<script src="../assets/js/chrome.js?v=8"></script>
+<script src="../assets/js/i18n.js?v=8"></script>
+<script src="../assets/js/shagird-store.js?v=8"></script>
+<script>
+  // ---- Auth tab switching ----
+  document.querySelectorAll("#auth-section .compose-tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll("#auth-section .compose-tab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      const mode = tab.dataset.mode;
+      document.getElementById("login-form").style.display = mode === "login" ? "block" : "none";
+      document.getElementById("register-form").style.display = mode === "register" ? "block" : "none";
+    });
+  });
+
+  function handleLogin() {
+    const name = document.getElementById("login-name").value;
+    const pin = document.getElementById("login-pin").value;
+    const res = ShagirdStore.login(name, pin);
+    const errEl = document.getElementById("login-error");
+    if (!res.ok) { errEl.textContent = res.error; return; }
+    errEl.textContent = "";
+    showWall();
+  }
+
+  function handleRegister() {
+    const name = document.getElementById("register-name").value;
+    const pin = document.getElementById("register-pin").value;
+    const res = ShagirdStore.register(name, pin);
+    const errEl = document.getElementById("register-error");
+    if (!res.ok) { errEl.textContent = res.error; return; }
+    errEl.textContent = "";
+    showWall();
+  }
+
+  function handleLogout() {
+    ShagirdStore.logout();
+    document.getElementById("wall-section").style.display = "none";
+    document.getElementById("auth-section").style.display = "block";
+  }
+
+  // ---- Post composer ----
+  let activePostType = "text";
+  document.querySelectorAll("#wall-section .compose-tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll("#wall-section .compose-tab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      activePostType = tab.dataset.postType;
+      const isText = activePostType === "text";
+      document.getElementById("post-content-text").style.display = isText ? "block" : "none";
+      document.getElementById("post-content-url").style.display = isText ? "none" : "block";
+      document.getElementById("post-content-url").placeholder =
+        activePostType === "image" ? "Tasveer ka URL paste karein" :
+        activePostType === "reel" ? "Reel/video ka link paste karein" :
+        "Link yahan paste karein";
+    });
+  });
+
+  function handlePost() {
+    const content = activePostType === "text"
+      ? document.getElementById("post-content-text").value
+      : document.getElementById("post-content-url").value;
+    const res = ShagirdStore.addPost({ type: activePostType, content });
+    const errEl = document.getElementById("post-error");
+    if (!res.ok) { errEl.textContent = res.error; return; }
+    errEl.textContent = "";
+    document.getElementById("post-content-text").value = "";
+    document.getElementById("post-content-url").value = "";
+    renderPosts();
+  }
+
+  function renderPosts() {
+    const posts = ShagirdStore.getPosts();
+    const list = document.getElementById("posts-list");
+    if (!posts.length) {
+      list.innerHTML = `<div class="card center" style="padding:50px;"><p class="muted">Abhi tak koi post nahi. Pehli post aap karein!</p></div>`;
+      return;
+    }
+    list.innerHTML = posts.map(post => {
+      const bodyHTML = {
+        text: `<p class="post-text">${escapeHTML(post.content)}</p>`,
+        image: `<img src="${escapeHTML(post.content)}" class="post-image" alt="Shagird ki tasveer" loading="lazy" onerror="this.style.display='none'">`,
+        link: `<a href="${escapeHTML(post.content)}" target="_blank" rel="noopener" class="post-link">🔗 ${escapeHTML(post.content)}</a>`,
+        reel: `<div class="post-link">🎬 <a href="${escapeHTML(post.content)}" target="_blank" rel="noopener">Reel dekhein</a></div>`,
+      }[post.type] || `<p class="post-text">${escapeHTML(post.content)}</p>`;
+
+      return `
+      <article class="shagird-post">
+        <div class="post-head">
+          <div class="post-avatar">${post.name.charAt(0).toUpperCase()}</div>
+          <div>
+            <div class="post-name">${escapeHTML(post.name)}</div>
+            <div class="post-time muted">${new Date(post.time).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</div>
+          </div>
+        </div>
+        ${bodyHTML}
+      </article>`;
+    }).join("");
+  }
+
+  function escapeHTML(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function showWall() {
+    document.getElementById("auth-section").style.display = "none";
+    document.getElementById("wall-section").style.display = "block";
+    const session = ShagirdStore.getSession();
+    document.getElementById("current-user-name").textContent = session.name;
+    renderPosts();
+  }
+
+  // On load, check existing session
+  const existingSession = ShagirdStore.getSession();
+  if (existingSession) showWall();
+</script>
+</body>
+</html>

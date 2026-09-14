@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide aur Bazaar — Barabanki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body data-page="city">
+<div class="grain"></div>
+<div id="site-header"></div>
+
+<section class="section" style="padding-bottom:20px;">
+  <a href="index.html" class="btn btn-ghost" style="margin-bottom:20px;">← Barabanki guide</a>
+  <div class="eyebrow">Shehr Guide</div>
+  <h1 style="font-size:40px; margin-bottom:14px;">Bazaar, Zaiqa aur Ziyada</h1>
+  <p class="muted" style="max-width:65ch;">
+    Barabanki ke mash'hoor maqamat, khaas zaiqe, showrooms aur mauqe —
+    ek nazar mein.
+  </p>
+</section>
+
+<section class="section section-tight" style="padding-top:0;">
+  <div class="grid-2" style="align-items:start; margin-bottom:30px;">
+    <div id="places-card"></div>
+    <div id="cuisine-card"></div>
+  </div>
+  <div class="grid-2" style="align-items:start; margin-bottom:30px;">
+    <div id="showrooms-card"></div>
+    <div id="hotels-card"></div>
+  </div>
+  <div id="jobs" style="scroll-margin-top:100px;">
+    <div id="jobs-card"></div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="../assets/js/data.js?v=8"></script>
+<script src="../assets/js/components.js?v=8"></script>
+<script src="../assets/js/chrome.js?v=8"></script>
+<script src="../assets/js/i18n.js?v=8"></script>
+<script>
+  const { places, cuisine, showrooms, hotels, jobs } = SITE_DATA;
+
+  document.getElementById("places-card").innerHTML = Components.simpleListCard(
+    "📍 Mash'hoor Maqamat", places, (p) => Components.plainRow(p, "note")
+  );
+  document.getElementById("cuisine-card").innerHTML = Components.simpleListCard(
+    "🍽️ Khaas Zaiqe", cuisine, (c) => Components.plainRow(c, "note")
+  );
+  document.getElementById("showrooms-card").innerHTML = Components.simpleListCard(
+    "🛍️ Showrooms", showrooms, (s) => Components.plainRow(s, "category")
+  );
+  document.getElementById("hotels-card").innerHTML = Components.simpleListCard(
+    "🏨 Hotels", hotels, (h) => Components.plainRow(h, "note")
+  );
+  document.getElementById("jobs-card").innerHTML = Components.simpleListCard(
+    "💼 Job Openings", jobs, (j) => `<li><span>${j.title} <span class="muted">· ${j.org}</span></span></li>`
+  );
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+# The companion mobile app is a separate project with its own git repo and
+# a sensitive release-signing keystore — never part of this website's repo.
+app/
+
+# Leftover empty dirs from a shell brace-expansion mistake, not real content.
+{books,poetry,shagird,city,assets*
+
+.claude/
+.DS_Store

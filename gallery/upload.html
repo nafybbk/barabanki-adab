@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallery Upload — Bazm-e-Aziz</title>
+<meta name="theme-color" content="#5c1a1b">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/main.css?v=8">
+</head>
+<body data-page="gallery">
+<div class="grain"></div>
+<div id="site-header"></div>
+
+<section class="section" style="max-width:720px;">
+  <div class="eyebrow">Adab Gallery</div>
+  <h1 style="font-size:30px;">Tasveerein Upload Karein</h1>
+  <p class="muted" style="margin-top:8px; font-size:14px;">
+    Har tasveer upload se pehle browser mein compress hoti hai, phir Cloudinary
+    ke <code>adab-gallery</code> folder mein jaati hai aur gallery par sab ko dikhti hai.
+  </p>
+
+  <!-- Login gate (admin password) -->
+  <div class="card" id="login-box" style="margin-top:24px; display:none;">
+    <p style="font-family:var(--font-ui); font-size:14px; margin-bottom:12px;">Upload ke liye admin password daalein:</p>
+    <div style="display:flex; gap:10px;">
+      <input type="password" id="pw-input" placeholder="Password"
+             style="flex:1; padding:10px 14px; border-radius:8px; border:1px solid rgba(0,0,0,0.2); font-family:var(--font-ui);">
+      <button class="btn btn-primary" id="pw-btn">Login</button>
+    </div>
+    <p id="pw-error" style="color:#a33; font-size:13px; margin-top:10px;"></p>
+  </div>
+
+  <!-- Upload UI -->
+  <div id="upload-box" style="margin-top:24px; display:none;">
+    <div class="upload-drop" id="drop-zone">
+      <div style="font-size:34px; margin-bottom:8px;">📤</div>
+      Tasveer / PDF yahan chhodein ya <u>tap kar ke chunein</u>
+      <div style="font-size:12px; opacity:0.65; margin-top:8px;">
+        Images auto-compress hongi · 40MB se badi videos nahi — wo YouTube par daal kar link paste karein
+      </div>
+      <input type="file" id="file-input" multiple accept="image/*,application/pdf,video/*" style="display:none;">
+    </div>
+    <div class="field" style="margin-top:16px;">
+      <input id="caption-input" placeholder="Caption (ikhtiyari) — jaise 'Mushaira 2025, Dewa Sharif'"
+             style="width:100%; padding:10px 14px; border-radius:8px; border:1px solid rgba(0,0,0,0.2); font-family:var(--font-ui); box-sizing:border-box;">
+    </div>
+    <div class="upload-queue" id="upload-queue"></div>
+    <div style="margin-top:20px; display:flex; gap:12px; flex-wrap:wrap;">
+      <button class="btn btn-primary" id="upload-btn" disabled>Upload Karein</button>
+      <a class="btn btn-ghost" href="index.html">Gallery dekhein →</a>
+    </div>
+    <p id="cfg-warning" style="color:#a33; font-size:13px; margin-top:14px;"></p>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="../assets/js/data.js?v=8"></script>
+<script src="../assets/js/chrome.js?v=8"></script>
+<script src="../assets/js/i18n.js?v=8"></script>
+<script src="../admin/auth.js"></script>
+<script src="../assets/js/media-hub.js?v=8"></script>
+<script>
+  const loginBox = document.getElementById("login-box");
+  const uploadBox = document.getElementById("upload-box");
+  const dropZone = document.getElementById("drop-zone");
+  const fileInput = document.getElementById("file-input");
+  const queueEl = document.getElementById("upload-queue");
+  const uploadBtn = document.getElementById("upload-btn");
+  const cfgWarning = document.getElementById("cfg-warning");
+
+  let queue = []; // { file, status }
+
+  function showUI() {
+    if (AdminAuth.isLoggedIn()) {
+      loginBox.style.display = "none";
+      uploadBox.style.display = "block";
+      if (!MediaHub.isConfigured()) {
+        cfgWarning.innerHTML = "⚠️ Cloudinary abhi set nahi hua — Admin Panel &gt; <strong>Gallery &amp; Media</strong> mein cloud name aur unsigned preset daalein, tab upload chalega.";
+      }
+      loadSharedFiles();
+    } else {
+      loginBox.style.display = "block";
+      uploadBox.style.display = "none";
+    }
+  }
+  document.getElementById("pw-btn").addEventListener("click", tryLogin);
+  document.getElementById("pw-input").addEventListener("keydown", (e) => { if (e.key === "Enter") tryLogin(); });
+  function tryLogin() {
+    if (AdminAuth.login(document.getElementById("pw-input").value)) showUI();
+    else document.getElementById("pw-error").textContent = "Password ghalat hai.";
+  }
+
+  // ---- File picking / drag-drop ----
+  dropZone.addEventListener("click", () => fileInput.click());
+  fileInput.addEventListener("change", () => addFiles(fileInput.files));
+  dropZone.addEventListener("dragover", (e) => { e.preventDefault(); });
+  dropZone.addEventListener("drop", (e) => { e.preventDefault(); addFiles(e.dataTransfer.files); });
+
+  function addFiles(fileList) {
+    for (const f of fileList) queue.push({ file: f, status: "taiyar" });
+    renderQueue();
+  }
+
+  function renderQueue() {
+    queueEl.innerHTML = queue.map((q, i) => `
+      <div class="upload-row" id="row-${i}">
+        ${q.file.type.startsWith("image/") ? `<img src="${URL.createObjectURL(q.file)}">` : `<span style="font-size:26px;">📄</span>`}
+        <span class="upload-name">${q.file.name} <span style="opacity:0.6;">(${MediaHub.fmtSize(q.file.size)})</span></span>
+        <span class="upload-bar"><span id="bar-${i}"></span></span>
+        <span class="upload-state" id="state-${i}">${q.status}</span>
+      </div>`).join("");
+    uploadBtn.disabled = !queue.some((q) => q.status === "taiyar");
+  }
+
+  // ---- Shared files from mobile (service worker share-target cache) ----
+  async function loadSharedFiles() {
+    if (!("caches" in window)) return;
+    try {
+      const cache = await caches.open("bazm-shared");
+      const metaRes = await cache.match("shared-files-meta");
+      if (!metaRes) return;
+      const meta = await metaRes.json();
+      for (let i = 0; i < meta.count; i++) {
+        const res = await cache.match(`shared-file-${i}`);
+        if (!res) continue;
+        const blob = await res.blob();
+        const name = decodeURIComponent(res.headers.get("X-File-Name") || `shared-${i}`);
+        queue.push({ file: new File([blob], name, { type: blob.type }), status: "taiyar" });
+      }
+      // Ek dafa parh liya — cache saaf kar do taake dobara na aaye.
+      const keys = await cache.keys();
+      await Promise.all(keys.map((k) => cache.delete(k)));
+      renderQueue();
+    } catch {}
+  }
+
+  // ---- Upload ----
+  uploadBtn.addEventListener("click", async () => {
+    uploadBtn.disabled = true;
+    const caption = document.getElementById("caption-input").value.trim();
+    for (let i = 0; i < queue.length; i++) {
+      const q = queue[i];
+      if (q.status !== "taiyar") continue;
+      const stateEl = document.getElementById(`state-${i}`);
+      const barEl = document.getElementById(`bar-${i}`);
+      stateEl.textContent = "compress ho rahi…";
+      try {
+        const res = await MediaHub.upload(q.file, {
+          caption,
+          onProgress: (p) => { barEl.style.width = Math.round(p * 100) + "%"; stateEl.textContent = Math.round(p * 100) + "%"; },
+        });
+        q.status = "ho gaya";
+        stateEl.textContent = res.sentSize < res.originalSize
+          ? `✓ ${MediaHub.fmtSize(res.originalSize)} → ${MediaHub.fmtSize(res.sentSize)}`
+          : "✓ upload ho gaya";
+        stateEl.classList.add("ok");
+      } catch (err) {
+        q.status = "fail";
+        stateEl.textContent = "✗ " + err.message;
+        stateEl.classList.add("err");
+      }
+    }
+    uploadBtn.disabled = !queue.some((q) => q.status === "taiyar");
+  });
+
+  showUI();
+</script>
+</body>
+</html>

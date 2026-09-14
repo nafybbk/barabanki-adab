@@ -1,0 +1,616 @@
+/* ============================================================
+   Design tokens — "Kagaz aur Siyahi" (paper & ink) system
+   ============================================================ */
+:root {
+  /* Palette: aged manuscript paper + deep maroon ink + antique gold */
+  --paper: #F6EFDF;
+  --paper-deep: #EDE2C8;
+  --ink: #3A0E12;
+  --ink-soft: #5C2027;
+  --maroon: #6B1622;
+  --maroon-deep: #4A0E17;
+  --gold: #B98A34;
+  --gold-soft: #D9B876;
+  --gold-pale: #F0DFB4;
+  --sage: #4C5D45;
+  --paper-line: rgba(58, 14, 18, 0.12);
+  --shadow: 0 12px 40px rgba(58, 14, 18, 0.18);
+
+  --font-nastaliq: 'Noto Nastaliq Urdu', serif;
+  --font-devanagari: 'Noto Sans Devanagari', 'Noto Serif Devanagari', sans-serif;
+  --font-display: 'Cormorant Garamond', 'Noto Nastaliq Urdu', serif;
+  --font-body: 'Noto Naskh Arabic', 'Cormorant Garamond', serif;
+  --font-latin: 'EB Garamond', Georgia, serif;
+  --font-ui: 'Cormorant Garamond', Georgia, serif;
+}
+
+body.lang-hindi { font-family: var(--font-devanagari); }
+body.lang-hindi h1, body.lang-hindi h2, body.lang-hindi h3 { font-family: var(--font-devanagari); }
+
+/* ============================================================
+   Language toggle
+   ============================================================ */
+#lang-toggle { display: flex; gap: 4px; background: var(--paper-deep); border-radius: 20px; padding: 3px; border: 1px solid var(--paper-line); }
+.lang-btn {
+  border: none; background: transparent; cursor: pointer;
+  padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 600;
+  color: var(--ink-soft); font-family: var(--font-ui); letter-spacing: 0.04em;
+  transition: all 0.2s;
+}
+.lang-btn.active { background: var(--maroon); color: var(--paper); }
+.lang-btn:hover:not(.active) { color: var(--maroon); }
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-latin);
+  line-height: 1.7;
+  background-image:
+    radial-gradient(circle at 15% 8%, rgba(185,138,52,0.06), transparent 45%),
+    radial-gradient(circle at 90% 85%, rgba(107,22,34,0.05), transparent 50%);
+}
+
+body[dir="rtl"], .urdu {
+  font-family: var(--font-body);
+  direction: rtl;
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+/* ============================================================
+   Texture — faint paper grain via layered gradients (no assets)
+   ============================================================ */
+.grain {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  opacity: 0.5; mix-blend-mode: multiply;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(58,14,18,0.012) 2px, rgba(58,14,18,0.012) 4px);
+}
+
+/* ============================================================
+   Top bar
+   ============================================================ */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: linear-gradient(180deg, var(--paper) 82%, transparent);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--paper-line);
+}
+.topbar-inner {
+  max-width: 1080px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 28px;
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand-mark {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--maroon); color: var(--gold-pale);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-nastaliq); font-size: 20px;
+  border: 1.5px solid var(--gold);
+}
+.brand-text { font-family: var(--font-ui); }
+.brand-text .name-ur { font-family: var(--font-nastaliq); font-size: 22px; color: var(--maroon-deep); line-height: 1.3; }
+.brand-text .name-sub { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); opacity: 0.75; }
+
+.nav-links { display: flex; gap: 28px; align-items: center; }
+.nav-links a {
+  font-size: 15px; font-weight: 500; color: var(--ink-soft);
+  position: relative; padding: 4px 0;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--maroon); }
+.nav-links a::after {
+  content: ''; position: absolute; left: 0; bottom: -2px;
+  width: 0; height: 1.5px; background: var(--gold);
+  transition: width 0.25s;
+}
+.nav-links a:hover::after { width: 100%; }
+
+.nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 6px; }
+.nav-toggle span { display: block; width: 22px; height: 2px; background: var(--ink); margin: 5px 0; }
+
+/* ============================================================
+   Buttons & pills
+   ============================================================ */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 26px; border-radius: 3px;
+  font-family: var(--font-ui); font-size: 16px; font-weight: 600;
+  border: 1px solid var(--maroon); cursor: pointer;
+  transition: all 0.25s;
+}
+.btn-primary { background: var(--maroon); color: var(--paper); }
+.btn-primary:hover { background: var(--maroon-deep); }
+.btn-ghost { background: transparent; color: var(--maroon); }
+.btn-ghost:hover { background: rgba(107,22,34,0.06); }
+.btn-gold { background: var(--gold); color: var(--maroon-deep); border-color: var(--gold); }
+.btn-gold:hover { background: var(--gold-soft); }
+
+.pill {
+  display: inline-block; padding: 4px 14px; border-radius: 20px;
+  font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+  border: 1px solid var(--gold); color: var(--maroon-deep);
+  background: rgba(185,138,52,0.08);
+}
+
+/* ============================================================
+   Section rhythm
+   ============================================================ */
+.section { max-width: 1080px; margin: 0 auto; padding: 90px 28px; position: relative; z-index: 1; }
+.section-tight { padding: 60px 28px; }
+.eyebrow {
+  font-family: var(--font-ui); font-size: 13px; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 12px;
+}
+.eyebrow::before { content: ''; width: 32px; height: 1px; background: var(--gold); }
+
+h1, h2, h3 { font-family: var(--font-display); color: var(--maroon-deep); font-weight: 600; margin: 0; }
+.h-urdu { font-family: var(--font-nastaliq); direction: rtl; }
+
+.divider {
+  width: 100%; height: 1px; margin: 56px 0;
+  background: linear-gradient(90deg, transparent, var(--gold) 50%, transparent);
+}
+.divider-orn { text-align: center; color: var(--gold); font-size: 22px; margin: 50px 0; letter-spacing: 20px; opacity: 0.7; }
+
+/* ============================================================
+   Card
+   ============================================================ */
+.card {
+  background: var(--paper-deep);
+  border: 1px solid var(--paper-line);
+  border-radius: 4px;
+  padding: 28px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+
+/* ============================================================
+   Footer
+   ============================================================ */
+footer {
+  background: var(--maroon-deep); color: var(--gold-pale);
+  padding: 56px 28px 28px;
+  margin-top: 100px;
+}
+footer .section { padding: 0; }
+footer a:hover { color: var(--gold); }
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+.footer-bottom {
+  border-top: 1px solid rgba(217,184,118,0.2); padding-top: 20px;
+  font-size: 13px; opacity: 0.7; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+}
+
+/* ============================================================
+   Utility
+   ============================================================ */
+.center { text-align: center; }
+.muted { color: var(--ink-soft); opacity: 0.8; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+
+@media (max-width: 860px) {
+  .nav-links { display: none; }
+  .nav-toggle { display: block; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+  .section { padding: 60px 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* ============================================================
+   Nav — active state + mobile drawer
+   ============================================================ */
+.nav-links a.nav-active { color: var(--maroon); }
+.nav-links a.nav-active::after { width: 100%; }
+
+.nav-mobile {
+  display: none; flex-direction: column; gap: 14px;
+  padding: 0 28px 20px;
+}
+.nav-mobile.open { display: flex; }
+.nav-mobile a { font-size: 16px; color: var(--ink-soft); padding: 6px 0; border-bottom: 1px solid var(--paper-line); }
+
+/* ============================================================
+   Hero (shared pattern across landing pages)
+   ============================================================ */
+.hero {
+  position: relative; z-index: 1;
+  max-width: 1080px; margin: 0 auto;
+  padding: 80px 28px 60px;
+  display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: center;
+}
+.hero-eyebrow { font-family: var(--font-nastaliq); font-size: 28px; color: var(--gold); direction: rtl; margin-bottom: 14px; }
+.hero h1 { font-size: 52px; line-height: 1.15; margin-bottom: 18px; }
+.hero-sub { font-size: 18px; color: var(--ink-soft); max-width: 46ch; margin-bottom: 30px; }
+.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+.hero-art {
+  aspect-ratio: 4/5; border-radius: 6px; overflow: hidden;
+  background: linear-gradient(155deg, var(--maroon) 0%, var(--maroon-deep) 70%);
+  position: relative;
+  border: 1px solid var(--gold);
+}
+.hero-art::before {
+  content: '';
+  position: absolute; inset: 10px;
+  border: 1px solid rgba(217,184,118,0.5);
+}
+.hero-art-verse {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-nastaliq); font-size: 34px; color: var(--gold-pale);
+  text-align: center; direction: rtl; padding: 40px;
+  line-height: 2.2;
+}
+
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; padding-top: 40px; }
+  .hero h1 { font-size: 36px; }
+  .hero-art { order: -1; aspect-ratio: 16/9; }
+}
+
+/* ============================================================
+   Book cards & flipbook grid
+   ============================================================ */
+.book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 32px; }
+.book-card { display: block; }
+.book-cover {
+  position: relative; aspect-ratio: 3/4.2; border-radius: 3px;
+  background: var(--maroon); overflow: hidden;
+  box-shadow: 6px 6px 0 var(--paper-line), 0 12px 26px rgba(58,14,18,0.18);
+  transition: transform 0.3s;
+}
+.book-card:hover .book-cover { transform: translateY(-6px); }
+.book-cover img { width: 100%; height: 100%; object-fit: cover; }
+.book-cover--fallback {
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(155deg, var(--maroon), var(--maroon-deep));
+}
+.book-cover--fallback::after {
+  content: attr(data-title);
+}
+.book-cover-spine { position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: rgba(0,0,0,0.25); }
+.book-cover-badge {
+  position: absolute; right: 8px; top: 8px; padding: 3px 9px;
+  font-size: 11px; letter-spacing: 0.04em; border-radius: 20px;
+  background: rgba(0,0,0,0.55); color: #fff; backdrop-filter: blur(2px);
+}
+.book-meta { margin-top: 12px; }
+.book-title-ur { font-family: var(--font-nastaliq); font-size: 19px; direction: rtl; color: var(--maroon-deep); }
+.book-title-en { font-size: 13px; color: var(--ink-soft); opacity: 0.75; margin-top: 2px; }
+
+/* ============================================================
+   Poem cards
+   ============================================================ */
+.poem-card {
+  background: var(--paper-deep); border: 1px solid var(--paper-line);
+  border-radius: 4px; padding: 26px 28px; margin-bottom: 20px;
+}
+.poem-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.poem-text { font-family: var(--font-nastaliq); font-size: 22px; line-height: 2.1; direction: rtl; color: var(--ink); }
+.poem-text-latin { font-size: 14px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--paper-line); }
+
+/* ============================================================
+   Search bar
+   ============================================================ */
+.search-bar {
+  display: flex; gap: 10px; margin-bottom: 40px;
+}
+.search-bar input {
+  flex: 1; padding: 14px 18px; font-size: 16px;
+  border: 1px solid var(--paper-line); border-radius: 3px;
+  background: var(--paper-deep); color: var(--ink);
+  font-family: var(--font-ui);
+}
+.search-bar input:focus { outline: none; border-color: var(--gold); }
+
+/* ============================================================
+   Simple lists (emergency numbers, hospitals, schools, etc.)
+   ============================================================ */
+.clean-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.clean-list li {
+  display: flex; justify-content: space-between; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid var(--paper-line);
+  font-size: 14px;
+}
+.clean-list li:last-child { border-bottom: none; }
+.clean-list li strong { color: var(--maroon); font-family: var(--font-ui); }
+
+/* ============================================================
+   Shagird circle — login + posts
+   ============================================================ */
+.auth-box {
+  max-width: 420px; margin: 0 auto; background: var(--paper-deep);
+  border: 1px solid var(--paper-line); border-radius: 6px; padding: 36px;
+}
+.auth-box h2 { text-align: center; margin-bottom: 6px; }
+.auth-box .muted { text-align: center; margin-bottom: 26px; font-size: 14px; }
+.field { margin-bottom: 18px; }
+.field label { display: block; font-size: 13px; color: var(--ink-soft); margin-bottom: 6px; font-family: var(--font-ui); }
+.field input, .field select, .field textarea {
+  width: 100%; padding: 12px 14px; font-size: 15px;
+  border: 1px solid var(--paper-line); border-radius: 3px;
+  background: var(--paper); color: var(--ink); font-family: var(--font-latin);
+}
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--gold); }
+.pin-input { letter-spacing: 10px; font-size: 22px; text-align: center; }
+
+.shagird-post {
+  background: var(--paper-deep); border: 1px solid var(--paper-line);
+  border-radius: 5px; padding: 22px; margin-bottom: 18px;
+}
+.post-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.post-avatar {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--maroon); color: var(--gold-pale);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-ui); font-weight: 700; font-size: 17px;
+}
+.post-name { font-family: var(--font-ui); font-weight: 600; color: var(--maroon-deep); }
+.post-time { font-size: 12px; }
+.post-text { font-size: 15px; white-space: pre-wrap; }
+.post-image { border-radius: 4px; margin-top: 6px; max-height: 420px; object-fit: cover; width: 100%; }
+.post-link { font-size: 14px; color: var(--maroon); }
+.compose-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+.compose-tab {
+  flex: 1; padding: 10px; text-align: center; font-size: 13px;
+  border: 1px solid var(--paper-line); border-radius: 3px; cursor: pointer;
+  background: var(--paper); color: var(--ink-soft);
+}
+.compose-tab.active { background: var(--maroon); color: var(--paper); border-color: var(--maroon); }
+
+/* ============================================================
+   Footer detail styles
+   ============================================================ */
+.footer-heading { font-family: var(--font-ui); font-weight: 600; margin-bottom: 12px; color: var(--gold); }
+.footer-links { display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+
+/* ============================================================
+   Timeline (city history)
+   ============================================================ */
+.timeline { position: relative; padding-left: 32px; border-left: 2px solid var(--gold-soft); }
+.timeline-item { position: relative; padding-bottom: 32px; }
+.timeline-item::before {
+  content: ''; position: absolute; left: -38px; top: 4px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--gold); border: 2px solid var(--paper);
+}
+
+/* ============================================================
+   Flipbook reader
+   ============================================================ */
+.reader-shell { background: var(--maroon-deep); border-radius: 8px; padding: 32px; --leaf-h: 620px; --reader-zoom: 1; }
+@media (max-width: 520px) { .reader-shell { --leaf-h: 400px; } }
+
+/* Fullscreen (Rekhta-style "poori screen" reading) */
+.reader-shell:fullscreen { border-radius: 0; padding: 20px 24px; display: flex; flex-direction: column; overflow: hidden; }
+.reader-shell:fullscreen .reader-page-wrap { flex: 1; max-height: none; }
+
+.reader-toolbar { display: flex; justify-content: center; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 18px; }
+.reader-view-toggle { display: flex; justify-content: center; gap: 8px; }
+.reader-view-toggle button {
+  background: transparent; border: 1px solid rgba(255,255,255,0.25); color: var(--gold-pale);
+  font-family: var(--font-ui); font-size: 13px; padding: 6px 14px; border-radius: 20px; cursor: pointer;
+}
+.reader-view-toggle button.active { background: var(--gold); color: var(--maroon-deep); border-color: var(--gold); }
+
+/* In-app zoom controls */
+.reader-zoom { display: flex; align-items: center; gap: 6px; }
+.reader-zoom button, .reader-fs-btn {
+  background: transparent; border: 1px solid rgba(255,255,255,0.25); color: var(--gold-pale);
+  width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 16px;
+  font-family: var(--font-ui); line-height: 1; display: inline-flex; align-items: center; justify-content: center;
+}
+.reader-zoom button:hover:not(:disabled), .reader-fs-btn:hover { border-color: var(--gold); color: var(--gold); }
+.reader-zoom button:disabled { opacity: 0.3; cursor: not-allowed; }
+.reader-zoom .zoom-level { color: var(--gold-pale); font-family: var(--font-ui); font-size: 12px; min-width: 44px; text-align: center; }
+
+/* overflow:auto so the zoomed fixed-px book pans/scrolls inside the wrap
+   instead of being clipped by the centered flex container
+   (justify-content:center clips the leading edge of overflowing content
+   with no way to scroll to it). max-height keeps the wrap at the un-zoomed
+   book height so in-app zoom pans within the box rather than growing the page. */
+.reader-page-wrap { margin: 0 auto; position: relative; perspective: 2000px; overflow: auto; max-height: calc(var(--leaf-h) + 40px); touch-action: pan-y; }
+.reader-page-wrap.is-zoomed { cursor: grab; touch-action: none; }
+.reader-page-wrap.is-zoomed:active { cursor: grabbing; }
+.reader-book { display: flex; justify-content: center; align-items: flex-start; gap: 3px; width: max-content; min-width: 100%; margin: 0 auto; padding: 8px 0; }
+/* The book must be sized in plain fixed px with NO viewport-tied sizing.
+   Both vh units AND max-height/max-width media queries re-evaluate when the
+   browser is zoomed (zoom shrinks the CSS viewport), which cancels the zoom
+   out and makes the book look frozen at one physical size while the rest of
+   the page scales. Fixed px is the only sizing that scales 1:1 with zoom.
+   The lone exception is the real-phone breakpoint on --leaf-h (see
+   .reader-shell): on desktop it only triggers at ~400%+ zoom, where
+   400px x 4 is still far larger than 620px, so zoom growth stays
+   monotonic and never appears frozen.
+   --reader-zoom is the IN-APP zoom level (buttons / ctrl+wheel), applied
+   here so the whole leaf (and the %-sized canvas inside) scales with it. */
+.leaf-wrap { position: relative; height: calc(var(--leaf-h, 620px) * var(--reader-zoom, 1)); }
+.reader-leaf {
+  /* box-sizing:border-box is required here — with the default content-box,
+     aspect-ratio resolves against the content box and padding gets added
+     on TOP of that, inflating the leaf beyond its intended height:100% and
+     throwing off the ratio between the leaf and the canvas inside it
+     (worse the more you zoom, since the inflation is a fixed 68px either way). */
+  box-sizing: border-box;
+  background: var(--paper); border-radius: 3px; box-shadow: var(--shadow);
+  height: 100%; aspect-ratio: 3/4; width: auto; display: flex; align-items: center; justify-content: center;
+  overflow: hidden; position: relative;
+}
+.is-spread .reader-leaf { border-radius: 0; }
+.is-spread .leaf-wrap:first-child .reader-leaf { border-radius: 3px 0 0 3px; box-shadow: -2px 4px 16px rgba(0,0,0,0.2); }
+.is-spread .reader-leaf--right { border-radius: 0 3px 3px 0; }
+.is-spread .leaf-wrap:first-child::after {
+  content: ""; position: absolute; right: -3px; top: 0; bottom: 0; width: 6px;
+  background: linear-gradient(to right, transparent, rgba(0,0,0,0.18)); pointer-events: none;
+}
+.reader-page img { width: 100%; height: 100%; object-fit: contain; }
+
+/* ---- Page-curl turn animation ---- */
+.reader-canvas-stack { position: absolute; inset: 34px; transform-style: preserve-3d; }
+.page-canvas {
+  /* Pure percentage sizing: this recomputes automatically on browser zoom
+     or window resize with zero JS involvement, unlike a fixed px size. */
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: contain; backface-visibility: hidden; will-change: transform, opacity, filter;
+}
+.page-canvas.settled { position: absolute; inset: 0; width: 100%; height: 100%; }
+.page-canvas.turn-out-next {
+  transform-origin: right center; animation: curlOutNext 0.62s cubic-bezier(.45,.05,.55,.95) forwards;
+  box-shadow: -18px 0 40px -10px rgba(0,0,0,0.45);
+}
+.page-canvas.turn-out-prev {
+  transform-origin: left center; animation: curlOutPrev 0.62s cubic-bezier(.45,.05,.55,.95) forwards;
+  box-shadow: 18px 0 40px -10px rgba(0,0,0,0.45);
+}
+.page-canvas.turn-in {
+  animation: settleIn 0.62s cubic-bezier(.2,.7,.3,1) forwards;
+}
+@keyframes curlOutNext {
+  0%   { transform: rotateY(0deg) translateZ(0); filter: brightness(1); opacity: 1; }
+  55%  { transform: rotateY(-110deg) translateZ(-60px); filter: brightness(0.72); opacity: 1; }
+  100% { transform: rotateY(-165deg) translateZ(-90px); filter: brightness(0.55); opacity: 0; }
+}
+@keyframes curlOutPrev {
+  0%   { transform: rotateY(0deg) translateZ(0); filter: brightness(1); opacity: 1; }
+  55%  { transform: rotateY(110deg) translateZ(-60px); filter: brightness(0.72); opacity: 1; }
+  100% { transform: rotateY(165deg) translateZ(-90px); filter: brightness(0.55); opacity: 0; }
+}
+@keyframes settleIn {
+  0%   { opacity: 0; transform: scale(0.94) translateY(4px); filter: brightness(1.25); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: scale(1) translateY(0); filter: brightness(1); }
+}
+
+/* ---- Sparkles that fly off the turning page ---- */
+.sparkle-layer { position: absolute; inset: 0; pointer-events: none; overflow: visible; z-index: 5; }
+.sparkle {
+  position: absolute; left: var(--sx); top: var(--sy);
+  font-size: var(--ssize); color: var(--scolor);
+  opacity: 0; text-shadow: 0 0 6px currentColor;
+  animation: sparkleFly var(--sdur) ease-out var(--sdelay) forwards;
+}
+@keyframes sparkleFly {
+  0%   { opacity: 0; transform: translate(0,0) scale(0.3) rotate(0deg); }
+  15%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--sdx), var(--sdy)) scale(1) rotate(var(--srot)); }
+}
+.reader-controls { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 22px; flex-wrap: wrap; }
+.reader-controls button {
+  background: var(--gold); color: var(--maroon-deep); border: none;
+  width: 44px; height: 44px; border-radius: 50%; font-size: 18px; cursor: pointer;
+}
+.reader-controls button.reader-jump-btn { width: 38px; height: 38px; font-size: 15px; opacity: 0.85; }
+.reader-controls button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* Page progress slider — dir="rtl" on the input so it advances
+   right-to-left, matching how an Urdu kitab is read. */
+.reader-slider { margin-top: 18px; padding: 0 6px; display: flex; align-items: center; gap: 12px; }
+.reader-slider input { flex: 1; accent-color: var(--gold); cursor: pointer; min-width: 0; }
+.reader-slider .slider-label { color: var(--gold-pale); font-family: var(--font-ui); font-size: 12px; white-space: nowrap; opacity: 0.8; }
+
+.reader-goto { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; }
+.reader-goto label { color: var(--gold-pale); font-family: var(--font-ui); font-size: 13px; }
+.reader-goto input {
+  width: 70px; padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.06); color: var(--gold-pale); font-family: var(--font-ui); font-size: 14px; text-align: center;
+}
+.reader-goto button {
+  background: var(--gold); color: var(--maroon-deep); border: none;
+  padding: 6px 16px; border-radius: 20px; font-family: var(--font-ui); font-size: 13px; cursor: pointer;
+}
+.reader-page-num { color: var(--gold-pale); font-family: var(--font-ui); font-size: 15px; min-width: 90px; text-align: center; }
+
+/* ============================================================
+   Adab Gallery (Cloudinary) + media embeds
+   ============================================================ */
+.gallery-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+.gallery-item {
+  position: relative; border-radius: 6px; overflow: hidden; cursor: zoom-in;
+  background: var(--maroon-deep); aspect-ratio: 1; box-shadow: var(--shadow);
+}
+.gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.35s ease; }
+.gallery-item:hover img { transform: scale(1.04); }
+.gallery-item .gallery-caption {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 24px 12px 10px;
+  background: linear-gradient(to top, rgba(0,0,0,0.72), transparent);
+  color: #fff; font-family: var(--font-ui); font-size: 13px; pointer-events: none;
+}
+
+/* Lightbox */
+.lightbox {
+  position: fixed; inset: 0; z-index: 200; display: none;
+  align-items: center; justify-content: center; padding: 24px;
+  background: rgba(20, 6, 6, 0.92); cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 100%; max-height: 92vh; border-radius: 4px; box-shadow: 0 12px 60px rgba(0,0,0,0.6); }
+.lightbox .lightbox-caption {
+  position: absolute; bottom: 18px; left: 0; right: 0; text-align: center;
+  color: var(--gold-pale); font-family: var(--font-ui); font-size: 14px;
+}
+.lightbox .lightbox-close {
+  position: absolute; top: 14px; right: 18px; background: none; border: none;
+  color: #fff; font-size: 30px; cursor: pointer; opacity: 0.8;
+}
+
+/* Video & social cards — YouTube inline, Insta/FB click-to-load */
+.media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+.media-card { border-radius: 8px; overflow: hidden; background: var(--maroon-deep); box-shadow: var(--shadow); }
+.media-embed { position: relative; aspect-ratio: 16/9; background: #000; }
+.media-embed.media-embed--tall { aspect-ratio: 4/5; } /* insta/reel shape */
+.media-embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.media-embed .media-poster {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px;
+  background-size: cover; background-position: center; cursor: pointer; border: 0; color: #fff;
+}
+.media-embed .media-poster::before { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.35); }
+.media-embed .media-play {
+  position: relative; width: 62px; height: 62px; border-radius: 50%;
+  background: var(--gold); color: var(--maroon-deep); font-size: 24px;
+  display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+}
+.media-embed .media-platform { position: relative; font-family: var(--font-ui); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; }
+.media-card .media-meta {
+  display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  padding: 12px 14px; color: var(--gold-pale); font-family: var(--font-ui); font-size: 14px;
+}
+.media-card .media-meta a { color: var(--gold); font-size: 13px; white-space: nowrap; }
+
+/* Gallery upload page (mobile share target ka landing) */
+.upload-drop {
+  border: 2px dashed rgba(255,255,255,0.3); border-radius: 10px; padding: 34px 20px;
+  text-align: center; color: var(--gold-pale); font-family: var(--font-ui); cursor: pointer;
+  background: rgba(255,255,255,0.03);
+}
+.upload-drop:hover { border-color: var(--gold); }
+.upload-queue { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
+.upload-row {
+  display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+  background: rgba(255,255,255,0.05); border-radius: 8px; color: var(--gold-pale); font-family: var(--font-ui); font-size: 13px;
+}
+.upload-row img { width: 46px; height: 46px; object-fit: cover; border-radius: 5px; }
+.upload-row .upload-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.upload-row .upload-state { font-size: 12px; white-space: nowrap; }
+.upload-row .upload-state.ok { color: #8fce8f; }
+.upload-row .upload-state.err { color: #e08080; }
+.upload-bar { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.15); overflow: hidden; width: 90px; }
+.upload-bar span { display: block; height: 100%; width: 0; background: var(--gold); transition: width 0.2s; }

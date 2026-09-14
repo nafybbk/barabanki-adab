@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kitabein — Panch Shaya-shuda Majmuay</title>
+<meta name="description" content="Naseer Ahmad Ansari Barabankvi ki panch kitabon ka index.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Naskh+Arabic:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body data-page="books">
+<div class="grain"></div>
+<div id="site-header"></div>
+
+<section class="section" style="padding-bottom:40px;">
+  <div class="eyebrow">Kutub-Khana</div>
+  <h1 style="font-size:40px; margin-bottom:14px;">Panch Kitabein</h1>
+  <p class="muted" style="max-width:60ch;">
+    Teen kitabein is site ke apne flipbook reader mein padhi ja sakti hain —
+    safha palatte hue, jaise haathon mein asli kitab ho. Baaki do kitabein
+    Rekhta.org par shaya hain — cover par click karke Rekhta khulega.
+  </p>
+</section>
+
+<section class="section section-tight" style="padding-top:0;">
+  <div class="book-grid" id="book-grid"></div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="../assets/js/data.js?v=8"></script>
+<script src="../assets/js/components.js?v=8"></script>
+<script src="../assets/js/chrome.js?v=8"></script>
+<script src="../assets/js/i18n.js?v=8"></script>
+<script>
+  document.getElementById("book-grid").innerHTML = SITE_DATA.books.map(b => {
+    const href = b.external ? b.external : `reader.html?id=${b.id}`;
+    const targetAttrs = b.external ? ` target="_blank" rel="noopener"` : "";
+    return `
+    <a href="${href}"${targetAttrs} class="book-card">
+      <div class="book-cover">
+        <img src="../${b.cover}" alt="${b.title}" loading="lazy"
+             onerror="this.remove(); this.parentElement.classList.add('book-cover--fallback'); this.parentElement.setAttribute('data-title','${b.titleUrdu}')">
+        <div class="book-cover-spine"></div>
+        ${b.external ? '<div class="book-cover-badge">Rekhta</div>' : ""}
+      </div>
+      <div class="book-meta">
+        <div class="book-title-ur">${b.titleUrdu}</div>
+        <div class="book-title-en">${b.title} · ${b.year}</div>
+      </div>
+    </a>`;
+  }).join("");
+</script>
+</body>
+</html>

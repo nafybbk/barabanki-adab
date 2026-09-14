@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — Bazm-e-Aziz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/main.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body data-page="admin">
+<div class="grain"></div>
+
+<!-- ================= LOGIN GATE ================= -->
+<div id="login-gate" class="admin-login-wrap">
+  <div class="admin-login-box">
+    <div class="h-urdu" style="font-size:30px; text-align:center; margin-bottom:6px;">بزم عزیز</div>
+    <h2 style="text-align:center; margin-bottom:24px;">Admin Panel</h2>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="admin-password" placeholder="Apna admin password daalein">
+    </div>
+    <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="tryLogin()">Login</button>
+    <p id="login-error" style="color:#a33; font-size:13px; margin-top:12px; text-align:center;"></p>
+    <p class="muted" style="font-size:12px; text-align:center; margin-top:18px;">
+      Default password: <code>naseer2026</code> — login ke baad Settings mein badal lein.
+    </p>
+  </div>
+</div>
+
+<!-- ================= ADMIN SHELL ================= -->
+<div id="admin-shell" style="display:none;">
+  <div class="admin-topbar">
+    <div class="admin-topbar-inner">
+      <div class="admin-brand">
+        <span class="h-urdu" style="font-size:20px;">بزم عزیز</span>
+        <span class="muted" style="font-size:13px;">Admin Panel</span>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <a href="../index.html" class="btn btn-ghost" target="_blank" style="padding:8px 16px; font-size:13px;">Website dekhein ↗</a>
+        <button class="btn btn-ghost" style="padding:8px 16px; font-size:13px;" onclick="adminLogout()">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <button class="admin-nav-item active" data-tab="dashboard">📊 Dashboard</button>
+      <button class="admin-nav-item" data-tab="identity">👤 Naseer Sahab &amp; Ustad</button>
+      <button class="admin-nav-item" data-tab="books">📚 Kitabein &amp; Flipbooks</button>
+      <button class="admin-nav-item" data-tab="poetry">✒️ Shayeri Archive</button>
+      <button class="admin-nav-item" data-tab="shagird">👥 Shagird &amp; Posts</button>
+      <button class="admin-nav-item" data-tab="gallery">🖼️ Gallery &amp; Media</button>
+      <button class="admin-nav-item" data-tab="city">🕌 Barabanki Guide</button>
+      <button class="admin-nav-item" data-tab="settings">⚙️ Settings</button>
+    </aside>
+
+    <main class="admin-main">
+
+      <!-- ===== DASHBOARD ===== -->
+      <section class="admin-tab" id="tab-dashboard">
+        <h1>Dashboard</h1>
+        <p class="muted" style="margin-bottom:30px;">Website ka mukhtasar jaiza.</p>
+        <div class="admin-stats-grid" id="dashboard-stats"></div>
+
+        <div class="admin-card" style="margin-top:30px;">
+          <h3>Kya karna baaki hai?</h3>
+          <ul class="checklist" id="todo-list"></ul>
+        </div>
+      </section>
+
+      <!-- ===== IDENTITY (Poet + Ustad + Bazm) ===== -->
+      <section class="admin-tab" id="tab-identity" style="display:none;">
+        <h1>Naseer Sahab &amp; Ustad Azeez Sahab</h1>
+        <p class="muted" style="margin-bottom:30px;">Ye tafseel homepage aur poori website par dikhti hai.</p>
+
+        <div class="admin-card">
+          <h3>Naseer Ansari Barabankvi — Shayer</h3>
+          <div class="admin-form-grid">
+            <div class="field"><label>Naam (English)</label><input id="poet-name" data-path="poet.name"></div>
+            <div class="field"><label>نام (Urdu)</label><input id="poet-nameUrdu" data-path="poet.nameUrdu" class="urdu"></div>
+            <div class="field"><label>नाम (Hindi)</label><input id="poet-nameHindi" data-path="poet.nameHindi"></div>
+            <div class="field"><label>Saal (years)</label><input id="poet-years" data-path="poet.years" placeholder="jaise 1955 — hayaat hain"></div>
+          </div>
+          <div class="field"><label>Tagline (English)</label><input id="poet-tagline" data-path="poet.tagline"></div>
+          <div class="field"><label>Tagline (Urdu)</label><input id="poet-taglineUrdu" data-path="poet.taglineUrdu" class="urdu"></div>
+          <div class="field"><label>Tagline (Hindi)</label><input id="poet-taglineHindi" data-path="poet.taglineHindi"></div>
+          <div class="field"><label>Taaruf / Bio (English)</label><textarea id="poet-bio" data-path="poet.bio" rows="4"></textarea></div>
+          <div class="field"><label>تعارف (Urdu)</label><textarea id="poet-bioUrdu" data-path="poet.bioUrdu" rows="4" class="urdu"></textarea></div>
+          <div class="field"><label>परिचय (Hindi)</label><textarea id="poet-bioHindi" data-path="poet.bioHindi" rows="4"></textarea></div>
+          <div class="field">
+            <label>Tasveer</label>
+            <input type="file" id="poet-photo-upload" accept="image/*">
+            <div class="upload-preview" id="poet-photo-preview"></div>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <h3>Ustad Azeez Sahab</h3>
+          <p class="muted" style="font-size:13px; margin-bottom:16px;">Naseer sahab ke ustad, jinke ehtaram mein Bazm-e-Aziz qayam hai.</p>
+          <div class="admin-form-grid">
+            <div class="field"><label>Naam (English)</label><input id="ustad-name" data-path="ustad.name"></div>
+            <div class="field"><label>نام (Urdu)</label><input id="ustad-nameUrdu" data-path="ustad.nameUrdu" class="urdu"></div>
+            <div class="field"><label>नाम (Hindi)</label><input id="ustad-nameHindi" data-path="ustad.nameHindi"></div>
+          </div>
+          <div class="field"><label>Taaruf (English)</label><textarea id="ustad-note" data-path="ustad.note" rows="3"></textarea></div>
+          <div class="field"><label>تعارف (Urdu)</label><textarea id="ustad-noteUrdu" data-path="ustad.noteUrdu" rows="3" class="urdu"></textarea></div>
+          <div class="field"><label>परिचय (Hindi)</label><textarea id="ustad-noteHindi" data-path="ustad.noteHindi" rows="3"></textarea></div>
+          <div class="field">
+            <label>Tasveer</label>
+            <input type="file" id="ustad-photo-upload" accept="image/*">
+            <div class="upload-preview" id="ustad-photo-preview"></div>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <h3>Bazm-e-Aziz</h3>
+          <div class="field"><label>Qayam ka saal</label><input id="bazm-founded" data-path="bazm.founded"></div>
+          <div class="field"><label>Intro (English)</label><textarea id="bazm-intro" data-path="bazm.intro" rows="4"></textarea></div>
+          <div class="field"><label>تعارف (Urdu)</label><textarea id="bazm-introUrdu" data-path="bazm.introUrdu" rows="4" class="urdu"></textarea></div>
+          <div class="field"><label>परिचय (Hindi)</label><textarea id="bazm-introHindi" data-path="bazm.introHindi" rows="4"></textarea></div>
+        </div>
+
+        <button class="btn btn-primary" onclick="saveIdentityTab()">Save karein</button>
+        <span id="identity-saved-msg" class="saved-msg"></span>
+      </section>
+
+      <!-- ===== BOOKS ===== -->
+      <section class="admin-tab" id="tab-books" style="display:none;">
+        <h1>Kitabein &amp; Flipbooks</h1>
+        <p class="muted" style="margin-bottom:20px;">
+          Har kitab ke liye PDF upload karein — flipbook reader automatically
+          use dikhana shuru kar dega. Cover image bhi daal sakte hain.
+        </p>
+        <div id="books-list"></div>
+      </section>
+
+      <!-- ===== POETRY ===== -->
+      <section class="admin-tab" id="tab-poetry" style="display:none;">
+        <h1>Shayeri Archive</h1>
+        <p class="muted" style="margin-bottom:20px;">
+          Har sher/ghazal yahan add karein taake wo searchable archive mein aaye.
+        </p>
+        <button class="btn btn-primary" onclick="addNewPoem()" style="margin-bottom:20px;">+ Naya Sher/Ghazal Add Karein</button>
+        <div id="poems-list"></div>
+      </section>
+
+      <!-- ===== SHAGIRD ===== -->
+      <section class="admin-tab" id="tab-shagird" style="display:none;">
+        <h1>Shagird &amp; Posts</h1>
+        <p class="muted" style="margin-bottom:20px;">
+          Registered shagirdon aur unki posts ka jaiza. Koi bhi post yahan se hata sakte hain.
+        </p>
+        <div class="admin-card">
+          <h3>Registered Shagird</h3>
+          <div id="shagird-users-list"></div>
+        </div>
+        <div class="admin-card">
+          <h3>Sab Posts</h3>
+          <div id="shagird-posts-list"></div>
+        </div>
+      </section>
+
+      <!-- ===== GALLERY & MEDIA ===== -->
+      <section class="admin-tab" id="tab-gallery" style="display:none;">
+        <h1>Gallery &amp; Media</h1>
+        <p class="muted" style="margin-bottom:20px;">
+          Tasveerein/PDF Cloudinary ke <code>adab-gallery</code> folder mein jaati hain
+          (upload se pehle auto-compress) aur Gallery page par sab ko dikhti hain.
+        </p>
+
+        <div class="admin-card">
+          <h3>☁️ Cloudinary Setup</h3>
+          <div class="admin-form-grid">
+            <div class="field"><label>Cloud Name</label><input id="cld-cloud-name" placeholder="jaise: dxy12abc"></div>
+            <div class="field"><label>Upload Preset (unsigned)</label><input id="cld-preset" placeholder="adab_unsigned"></div>
+          </div>
+          <button class="btn btn-primary" onclick="saveCloudinaryConfig()">Save karein</button>
+          <button class="btn btn-ghost" onclick="testCloudinaryConfig()" style="margin-left:8px;">Connection test karein</button>
+          <span id="gallery-saved-msg" class="saved-msg"></span>
+          <div id="cld-test-result" style="font-size:13px; margin-top:10px; font-family:var(--font-ui);"></div>
+          <details style="margin-top:16px; font-size:13px; line-height:1.8;">
+            <summary style="cursor:pointer; font-weight:600;">Setup ke 4 qadam (ek dafa karna hai)</summary>
+            <ol style="margin-top:10px; padding-left:20px;">
+              <li><a href="https://cloudinary.com/users/register_free" target="_blank" rel="noopener">cloudinary.com</a> par free account banayein — dashboard par <strong>Cloud name</strong> milega, upar daalein.</li>
+              <li>Settings → Upload → <strong>Add upload preset</strong>: naam <code>adab_unsigned</code>, Signing&nbsp;mode: <strong>Unsigned</strong>, Asset folder: <code>adab-gallery</code>. Save.</li>
+              <li>Settings → Security → <strong>"Resource list"</strong> ko <u>allowed</u> rakhein (Restricted media types mein us par tick NA ho) — isi se gallery page sab tasveerein list kar pata hai.</li>
+              <li>Cloud name website ki <code>assets/js/data.js</code> (cloudinary.cloudName) mein bhi daalein taake sab visitors ko gallery dikhe — ya mujhe (Claude) bata dein, main daal dunga.</li>
+            </ol>
+          </details>
+        </div>
+
+        <div class="admin-card">
+          <h3>📤 Upload</h3>
+          <p class="muted" style="font-size:13px; margin-bottom:12px;">
+            Asaan tareeqa: <a href="../gallery/upload.html" target="_blank">Upload page kholein ↗</a> —
+            wahi page mobile app (share) se bhi khulta hai. Drag-drop, caption, progress sab wahan hai.
+          </p>
+        </div>
+
+        <div class="admin-card">
+          <h3>📱 Mobile App — kitne phones par hai</h3>
+          <p class="muted" style="font-size:13px; margin-bottom:12px;">
+            App har phone se din mein ek khamosh ping bhejti hai (koi login nahi).
+            Yahan dikhega kaun se phone par app hai aur aakhri dafa kab khuli.
+          </p>
+          <button class="btn btn-ghost" onclick="loadAppPings()">Phones check karein</button>
+          <div id="ping-result" style="font-size:13px; margin-top:12px; font-family:var(--font-ui); line-height:1.9;"></div>
+        </div>
+
+        <div class="admin-card">
+          <h3>🎬 Video &amp; Social Links</h3>
+          <p class="muted" style="font-size:13px; margin-bottom:14px; line-height:1.7;">
+            <strong>Policy:</strong> YouTube link → gallery par inline video ·
+            Instagram/Facebook link → click par embed + asal link ·
+            <strong>Reels:</strong> Cloudinary par nahi (MB zyada) — YouTube (Shorts) par
+            upload kar ke link yahan paste karein.
+          </p>
+          <div id="media-editor"></div>
+          <button class="btn btn-ghost" onclick="addMediaLink()">+ Link Add Karein</button>
+        </div>
+      </section>
+
+      <!-- ===== CITY ===== -->
+      <section class="admin-tab" id="tab-city" style="display:none;">
+        <h1>Barabanki Guide</h1>
+        <p class="muted" style="margin-bottom:20px;">Shehr ki maloomat edit karein.</p>
+
+        <div class="admin-card">
+          <h3>Shehr ka Taaruf</h3>
+          <div class="field"><label>Intro (English)</label><textarea id="city-intro" data-path="city.intro" rows="3"></textarea></div>
+          <div class="field"><label>تعارف (Urdu)</label><textarea id="city-introUrdu" data-path="city.introUrdu" rows="3" class="urdu"></textarea></div>
+          <div class="field"><label>परिचय (Hindi)</label><textarea id="city-introHindi" data-path="city.introHindi" rows="3"></textarea></div>
+          <div class="field"><label>Tareekh / History (English)</label><textarea id="city-history" data-path="city.history" rows="3"></textarea></div>
+        </div>
+
+        <div class="admin-card">
+          <h3>Emergency Numbers</h3>
+          <div id="emergency-editor"></div>
+          <button class="btn btn-ghost" onclick="addListItem('emergency', {label:'', number:''})">+ Number Add Karein</button>
+        </div>
+
+        <div class="admin-card">
+          <h3>Dargah / Ziyarat</h3>
+          <div id="dargah-editor"></div>
+          <button class="btn btn-ghost" onclick="addListItem('dargah', {name:'', distance:'', note:''})">+ Dargah Add Karein</button>
+        </div>
+
+        <button class="btn btn-primary" onclick="saveCityTab()">Save karein</button>
+        <span id="city-saved-msg" class="saved-msg"></span>
+      </section>
+
+      <!-- ===== SETTINGS ===== -->
+      <section class="admin-tab" id="tab-settings" style="display:none;">
+        <h1>Settings</h1>
+
+        <div class="admin-card">
+          <h3>Admin Password Badlein</h3>
+          <div class="field"><label>Naya Password</label><input type="password" id="new-password"></div>
+          <button class="btn btn-primary" onclick="changePassword()">Password Update Karein</button>
+          <span id="password-saved-msg" class="saved-msg"></span>
+        </div>
+
+        <div class="admin-card">
+          <h3>Data Backup</h3>
+          <p class="muted" style="font-size:14px; margin-bottom:14px;">
+            Poori website ki tafseel (edits, poems, shagird posts) ek file mein
+            save karein — hosting badalte waqt kaam aayegi.
+          </p>
+          <button class="btn btn-gold" onclick="exportData()">⬇️ Data Export Karein (.json)</button>
+          <div style="margin-top:16px;">
+            <label class="muted" style="font-size:13px; display:block; margin-bottom:6px;">Data Import Karein:</label>
+            <input type="file" id="import-file" accept=".json">
+          </div>
+        </div>
+
+        <div class="admin-card" style="border-color: #c99;">
+          <h3 style="color:#a33;">⚠️ Zaroori Maloomat — Hosting ke baare mein</h3>
+          <p style="font-size:14px; line-height:1.7;">
+            Filhal ye website <strong>browser ki local storage</strong> mein data
+            rakhti hai — matlab admin panel se ki gayi tabdeeliyan sirf <em>isi
+            computer aur browser</em> mein dikhti hain, doosre logon ko nahi.
+            <br><br>
+            Jab aap <strong>home server</strong> setup karein (jaisa aapne bataya),
+            to hum is data ko ek chhoti backend/database mein shift kar denge
+            taake:
+          </p>
+          <ul style="font-size:14px; line-height:2; margin-top:10px;">
+            <li>Admin panel ki tabdeeliyan sab visitors ko dikhein</li>
+            <li>Shagirdon ki posts sab logon ko real-time dikhein</li>
+            <li>PDFs seedhe server par host hon (bade files ke liye behtar)</li>
+          </ul>
+          <p style="font-size:14px; margin-top:14px;">
+            Filhal ke liye: <strong>Data Export</strong> button se apna kaam
+            mehfooz rakhein, aur home server tayyar hote hi mujhe bataiye —
+            main migration kara dunga.
+          </p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script src="../assets/js/data.js?v=8"></script>
+<script src="../assets/js/media-hub.js?v=8"></script>
+<script src="auth.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

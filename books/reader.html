@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kitab Padhein</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/main.css?v=7">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body data-page="books">
+<div class="grain"></div>
+<div id="site-header"></div>
+
+<section class="section" style="padding-bottom:20px;">
+  <a href="index.html" class="btn btn-ghost" style="margin-bottom:20px;">← Sab kitabein</a>
+  <h1 id="book-title" style="font-size:32px;"></h1>
+  <p class="muted" id="book-desc" style="max-width:60ch; margin-top:8px;"></p>
+</section>
+
+<section class="section section-tight" style="padding-top:0;">
+  <div class="reader-shell">
+    <div class="reader-toolbar">
+      <div class="reader-view-toggle" id="view-toggle">
+        <button type="button" data-mode="single" id="mode-single">Ek Safha</button>
+        <button type="button" data-mode="spread" id="mode-spread">Do Safhe (Kitab)</button>
+      </div>
+      <div class="reader-zoom" id="zoom-controls">
+        <button type="button" id="zoom-out" aria-label="Zoom kam karein" title="Zoom kam (−)">−</button>
+        <span class="zoom-level" id="zoom-level">100%</span>
+        <button type="button" id="zoom-in" aria-label="Zoom badhayein" title="Zoom zyada (+)">+</button>
+        <button type="button" id="zoom-reset" aria-label="Zoom reset" title="Zoom reset" style="font-size:13px;">⟲</button>
+      </div>
+      <button type="button" class="reader-fs-btn" id="btn-fullscreen" aria-label="Poori screen" title="Poori screen">⛶</button>
+    </div>
+    <div class="reader-page-wrap">
+      <div class="reader-book" id="reader-book">
+        <div class="leaf-wrap">
+          <div class="reader-leaf" id="leaf-left">
+            <div style="color: var(--ink-soft); font-family: var(--font-ui); text-align:center;" id="reader-status">
+              Kitab load ho rahi hai&hellip;
+            </div>
+            <div class="reader-canvas-stack" id="stack-left"></div>
+          </div>
+          <div class="sparkle-layer" id="sparkle-left"></div>
+        </div>
+        <div class="leaf-wrap" id="leaf-wrap-right" style="display:none;">
+          <div class="reader-leaf reader-leaf--right" id="leaf-right">
+            <div class="reader-canvas-stack" id="stack-right"></div>
+          </div>
+          <div class="sparkle-layer" id="sparkle-right"></div>
+        </div>
+      </div>
+    </div>
+    <div class="reader-controls">
+      <button id="btn-first" class="reader-jump-btn" aria-label="Pehla safha" title="Pehla safha">⇤</button>
+      <button id="btn-prev" aria-label="Agla safha">‹</button>
+      <div class="reader-page-num" id="page-num">— / —</div>
+      <button id="btn-next" aria-label="Pichla safha">›</button>
+      <button id="btn-last" class="reader-jump-btn" aria-label="Aakhri safha" title="Aakhri safha">⇥</button>
+    </div>
+    <div class="reader-slider">
+      <span class="slider-label">Aakhir</span>
+      <input type="range" id="page-slider" dir="rtl" min="1" max="1" value="1" aria-label="Safhon par phisalein">
+      <span class="slider-label">Shuru</span>
+    </div>
+    <div class="reader-goto">
+      <label for="goto-input">Safha par jaayein:</label>
+      <input type="number" id="goto-input" min="1" inputmode="numeric">
+      <button id="goto-btn" type="button">Jao</button>
+    </div>
+  </div>
+
+  <div style="margin-top:24px; text-align:center;">
+    <a id="download-link" href="#" class="btn btn-gold" download>PDF download karein</a>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="../assets/js/data.js?v=8"></script>
+<script src="../assets/js/chrome.js?v=8"></script>
+<script src="../assets/js/i18n.js?v=8"></script>
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+  const params = new URLSearchParams(window.location.search);
+  const bookId = params.get("id");
+  const book = SITE_DATA.books.find(b => b.id === bookId) || SITE_DATA.books[0];
+
+  document.getElementById("book-title").innerHTML =
+    `<span class="h-urdu">${book.titleUrdu}</span> <span class="muted" style="font-size:18px;">— ${book.title}</span>`;
+  document.getElementById("book-desc").textContent = book.description;
+  document.getElementById("download-link").href = "../" + book.pdf;
+
+  const statusEl = document.getElementById("reader-status");
+  const bookEl = document.getElementById("reader-book");
+  const leafWrapRight = document.getElementById("leaf-wrap-right");
+  const stackLeft = document.getElementById("stack-left");
+  const stackRight = document.getElementById("stack-right");
+  const sparkleLeft = document.getElementById("sparkle-left");
+  const sparkleRight = document.getElementById("sparkle-right");
+  const pageNumEl = document.getElementById("page-num");
+  const btnPrev = document.getElementById("btn-prev");
+  const btnNext = document.getElementById("btn-next");
+  const btnFirst = document.getElementById("btn-first");
+  const btnLast = document.getElementById("btn-last");
+  const gotoInput = document.getElementById("goto-input");
+  const gotoBtn = document.getElementById("goto-btn");
+  const modeSingleBtn = document.getElementById("mode-single");
+  const modeSpreadBtn = document.getElementById("mode-spread");
+  const shellEl = document.querySelector(".reader-shell");
+  const pageWrap = document.querySelector(".reader-page-wrap");
+  const zoomInBtn = document.getElementById("zoom-in");
+  const zoomOutBtn = document.getElementById("zoom-out");
+  const zoomResetBtn = document.getElementById("zoom-reset");
+  const zoomLevelEl = document.getElementById("zoom-level");
+  const fsBtn = document.getElementById("btn-fullscreen");
+  const pageSlider = document.getElementById("page-slider");
+
+  // Urdu kitab hai — safhe RTL order mein palte hain: khulay panne mein
+  // ZIYADA (aage ka) safha screen ke BAAYEIN (left) taraf hota hai, aur
+  // KAM (peechay ka) safha DAAYEIN (right) taraf — jaise asli Urdu kitab mein.
+  const RTL_BOOK = true;
+
+  let pdfDoc = null;
+  let currentPage = 1; // left-most page currently shown
+  let rendering = false;
+  let viewMode = localStorage.getItem("adab-reader-view") ||
+    (window.innerWidth >= 980 ? "spread" : "single");
+
+  function applyViewMode() {
+    modeSingleBtn.classList.toggle("active", viewMode === "single");
+    modeSpreadBtn.classList.toggle("active", viewMode === "spread");
+    bookEl.classList.toggle("is-spread", viewMode === "spread");
+  }
+  modeSingleBtn.addEventListener("click", () => switchMode("single"));
+  modeSpreadBtn.addEventListener("click", () => switchMode("spread"));
+  function switchMode(mode) {
+    if (mode === viewMode) return;
+    viewMode = mode;
+    localStorage.setItem("adab-reader-view", mode);
+    applyViewMode();
+    if (pdfDoc) renderSpread(currentPage, null);
+  }
+  applyViewMode();
+
+  // ---- In-app zoom (buttons / ctrl+wheel) ----
+  const ZOOM_MIN = 1, ZOOM_MAX = 3, ZOOM_STEP = 0.25;
+  let zoom = 1;
+  function setZoom(z) {
+    z = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Math.round(z * 100) / 100));
+    if (z === zoom) return;
+    zoom = z;
+    applyZoom();
+  }
+  function applyZoom() {
+    shellEl.style.setProperty("--reader-zoom", zoom);
+    zoomLevelEl.textContent = Math.round(zoom * 100) + "%";
+    zoomInBtn.disabled = zoom >= ZOOM_MAX;
+    zoomOutBtn.disabled = zoom <= ZOOM_MIN;
+    pageWrap.classList.toggle("is-zoomed", zoom > 1);
+    // Zoomed-in book grows leftward+rightward; keep it centred in the wrap.
+    pageWrap.scrollLeft = (pageWrap.scrollWidth - pageWrap.clientWidth) / 2;
+  }
+  zoomInBtn.addEventListener("click", () => setZoom(zoom + ZOOM_STEP));
+  zoomOutBtn.addEventListener("click", () => setZoom(zoom - ZOOM_STEP));
+  zoomResetBtn.addEventListener("click", () => setZoom(1));
+  applyZoom();
+
+  // Ctrl+scroll over the book zooms the book, not the whole page.
+  pageWrap.addEventListener("wheel", (e) => {
+    if (!e.ctrlKey) return;
+    e.preventDefault();
+    setZoom(zoom + (e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP));
+  }, { passive: false });
+
+  // ---- Drag-to-pan when zoomed, swipe/tap page-turn when not ----
+  let ptr = null;
+  pageWrap.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0 && e.pointerType === "mouse") return;
+    ptr = { x: e.clientX, y: e.clientY, sl: pageWrap.scrollLeft, st: pageWrap.scrollTop, moved: false, id: e.pointerId };
+    if (zoom > 1) pageWrap.setPointerCapture(e.pointerId);
+  });
+  pageWrap.addEventListener("pointermove", (e) => {
+    if (!ptr || e.pointerId !== ptr.id) return;
+    const dx = e.clientX - ptr.x, dy = e.clientY - ptr.y;
+    if (Math.abs(dx) > 8 || Math.abs(dy) > 8) ptr.moved = true;
+    if (zoom > 1 && ptr.moved) {
+      pageWrap.scrollLeft = ptr.sl - dx;
+      pageWrap.scrollTop = ptr.st - dy;
+    }
+  });
+  pageWrap.addEventListener("pointerup", (e) => {
+    if (!ptr || e.pointerId !== ptr.id) { ptr = null; return; }
+    const dx = e.clientX - ptr.x;
+    if (zoom === 1 && ptr.moved && Math.abs(dx) > 60) {
+      // Swipe: RTL kitab mein agla safha baayein se aata hai,
+      // isliye daayein taraf swipe = aage badhna.
+      if (dx > 0) (RTL_BOOK ? goForward() : goBackward());
+      else (RTL_BOOK ? goBackward() : goForward());
+    } else if (zoom === 1 && !ptr.moved && e.target.closest(".leaf-wrap")) {
+      // Tap/click on a page: left half = the visually-left button's action.
+      const rect = bookEl.getBoundingClientRect();
+      const leftHalf = e.clientX < rect.left + rect.width / 2;
+      if (leftHalf) (RTL_BOOK ? goForward() : goBackward());
+      else (RTL_BOOK ? goBackward() : goForward());
+    }
+    ptr = null;
+  });
+  pageWrap.addEventListener("pointercancel", () => { ptr = null; });
+
+  // ---- Fullscreen ----
+  fsBtn.addEventListener("click", () => {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (shellEl.requestFullscreen) shellEl.requestFullscreen().catch(() => {});
+  });
+  function updateFsLeafHeight() {
+    if (document.fullscreenElement === shellEl) {
+      // Book fills the screen minus toolbar/controls/slider chrome.
+      shellEl.style.setProperty("--leaf-h", Math.max(400, window.innerHeight - 235) + "px");
+    } else {
+      shellEl.style.removeProperty("--leaf-h");
+    }
+  }
+  document.addEventListener("fullscreenchange", () => {
+    const fs = document.fullscreenElement === shellEl;
+    fsBtn.textContent = fs ? "✕" : "⛶";
+    fsBtn.title = fs ? "Poori screen band karein" : "Poori screen";
+    updateFsLeafHeight();
+  });
+  window.addEventListener("resize", updateFsLeafHeight);
+
+  // ---- Page slider (RTL) ----
+  pageSlider.addEventListener("input", () => {
+    const n = parseInt(pageSlider.value, 10);
+    if (pdfDoc && !isNaN(n)) pageNumEl.textContent = `Safha ${n} / ${pdfDoc.numPages}`;
+  });
+  pageSlider.addEventListener("change", () => {
+    const n = parseInt(pageSlider.value, 10);
+    if (!isNaN(n)) jumpTo(n);
+  });
+
+  const POS_KEY = "adab-reader-pos-" + book.id;
+
+  async function loadBook() {
+    try {
+      const task = pdfjsLib.getDocument("../" + book.pdf);
+      task.onProgress = ({ loaded, total }) => {
+        if (total) statusEl.textContent = `Kitab load ho rahi hai… ${Math.min(100, Math.round((loaded / total) * 100))}%`;
+      };
+      pdfDoc = await task.promise;
+      // Pichhli baar jahan chhoda tha, wahin se kholo.
+      const saved = parseInt(localStorage.getItem(POS_KEY), 10);
+      const startPage = !isNaN(saved) && saved > 1 && saved <= pdfDoc.numPages ? saved : 1;
+      renderSpread(startPage, null);
+    } catch (err) {
+      statusEl.innerHTML = `
+        PDF abhi upload nahi hui hai.<br>
+        <span style="font-size:13px; opacity:0.7;">(${book.pdf} is folder mein daalne ke baad kitab yahan khulegi)</span>
+      `;
+      pageNumEl.textContent = "— / —";
+      btnPrev.disabled = true;
+      btnNext.disabled = true;
+    }
+  }
+
+  const SPARKLE_CHARS = ["✦", "✧", "★", "✨", "❋"];
+  const SPARKLE_COLORS = ["#e6c069", "#f4dfa0", "#caa356", "#fff4d6"];
+
+  function spawnSparkles(sparkleEl, edge) {
+    const count = 14 + Math.floor(Math.random() * 6);
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement("span");
+      s.className = "sparkle";
+      const sy = Math.random() * 100;
+      const sx = edge === "right" ? 100 - Math.random() * 6 : Math.random() * 6;
+      const flingX = (edge === "right" ? 1 : -1) * (60 + Math.random() * 140);
+      const flingY = (Math.random() - 0.6) * 140;
+      s.style.setProperty("--sx", sx + "%");
+      s.style.setProperty("--sy", sy + "%");
+      s.style.setProperty("--sdx", flingX + "px");
+      s.style.setProperty("--sdy", flingY + "px");
+      s.style.setProperty("--srot", (Math.random() * 360 - 180) + "deg");
+      s.style.setProperty("--ssize", (10 + Math.random() * 14) + "px");
+      s.style.setProperty("--sdur", (0.6 + Math.random() * 0.5) + "s");
+      s.style.setProperty("--sdelay", (Math.random() * 0.15) + "s");
+      s.style.setProperty("--scolor", SPARKLE_COLORS[i % SPARKLE_COLORS.length]);
+      s.textContent = SPARKLE_CHARS[i % SPARKLE_CHARS.length];
+      s.addEventListener("animationend", () => s.remove());
+      frag.appendChild(s);
+    }
+    sparkleEl.appendChild(frag);
+  }
+
+  async function renderLeaf(stackEl, sparkleEl, num, direction) {
+    if (!num || num < 1 || num > pdfDoc.numPages) {
+      stackEl.innerHTML = "";
+      return;
+    }
+    const page = await pdfDoc.getPage(num);
+
+    // Display size is plain CSS percentage (100% of the stack box) so it
+    // auto-follows browser zoom / window resize with no JS involved — a
+    // fixed pixel size computed once would go stale the moment the user
+    // zooms without turning a page. Raster resolution is rendered generously
+    // high (independent of the live box size) so it stays crisp at any zoom.
+    // Capped because devicePixelRatio grows with browser zoom in Chromium;
+    // at 500% zoom an uncapped 2.4*dpr canvas becomes tens of megapixels
+    // and page.render() silently fails or crawls.
+    const dpr = window.devicePixelRatio || 1;
+    const renderScale = Math.min(2.4 * dpr, 5);
+    const renderViewport = page.getViewport({ scale: renderScale });
+
+    const newCanvas = document.createElement("canvas");
+    newCanvas.width = renderViewport.width;
+    newCanvas.height = renderViewport.height;
+    newCanvas.className = "page-canvas turn-in";
+
+    const ctx = newCanvas.getContext("2d");
+    await page.render({ canvasContext: ctx, viewport: renderViewport }).promise;
+
+    // direction here is a visual curl direction: "curl-right" | "curl-left" | null
+    const oldCanvas = stackEl.querySelector(".page-canvas.settled");
+    if (oldCanvas && direction) {
+      oldCanvas.classList.remove("settled");
+      oldCanvas.classList.add(direction === "curl-right" ? "turn-out-next" : "turn-out-prev");
+      oldCanvas.addEventListener("animationend", () => oldCanvas.remove(), { once: true });
+    } else if (oldCanvas) {
+      oldCanvas.remove();
+    }
+
+    stackEl.appendChild(newCanvas);
+    if (direction) spawnSparkles(sparkleEl, direction === "curl-right" ? "right" : "left");
+
+    newCanvas.addEventListener("animationend", () => {
+      newCanvas.classList.remove("turn-in");
+      newCanvas.classList.add("settled");
+    }, { once: true });
+  }
+
+  // Returns { lowNum, highNum } for the spread that contains `num`.
+  // Page 1 (the cover) is always shown alone; after that pages pair up (2,3) (4,5) ...
+  // lowNum is always the smaller page number, highNum the larger (or null in single mode).
+  function spreadPagesFor(num) {
+    if (viewMode === "single") return { lowNum: num, highNum: null };
+    if (num <= 1) return { lowNum: 1, highNum: null };
+    const lowNum = num % 2 === 0 ? num : num - 1;
+    return { lowNum, highNum: lowNum + 1 <= pdfDoc.numPages ? lowNum + 1 : null };
+  }
+
+  async function renderSpread(num, dirForward) {
+    // dirForward: true = moving deeper into the book (higher page numbers),
+    // false = moving back toward the cover, null/undefined = no animation (jump/mode switch).
+    if (!pdfDoc || rendering) return;
+    rendering = true;
+    statusEl.style.display = "none";
+
+    const { lowNum, highNum } = spreadPagesFor(num);
+    leafWrapRight.style.display = highNum ? "" : "none";
+
+    // Urdu/RTL book: the earlier (low) page sits on the physical RIGHT,
+    // the later (high) page sits on the physical LEFT.
+    const domLeftPage = RTL_BOOK ? (highNum || lowNum) : lowNum;
+    const domRightPage = RTL_BOOK ? (highNum ? lowNum : null) : highNum;
+
+    // Moving forward (higher page numbers) visually curls toward the left
+    // in an RTL book (pages are "used up" from right to left).
+    let curlDir = null;
+    if (dirForward === true) curlDir = RTL_BOOK ? "curl-left" : "curl-right";
+    if (dirForward === false) curlDir = RTL_BOOK ? "curl-right" : "curl-left";
+
+    await Promise.all([
+      renderLeaf(stackLeft, sparkleLeft, domLeftPage, curlDir),
+      domRightPage ? renderLeaf(stackRight, sparkleRight, domRightPage, curlDir) : Promise.resolve(),
+    ]);
+
+    currentPage = lowNum;
+    pageNumEl.textContent = highNum
+      ? `Safha ${lowNum}–${highNum} / ${pdfDoc.numPages}`
+      : `Safha ${lowNum} / ${pdfDoc.numPages}`;
+    const atStart = lowNum <= 1;
+    const atEnd = (highNum || lowNum) >= pdfDoc.numPages;
+    // In an RTL book "next/forward" is the visually-LEFT button.
+    btnPrev.disabled = RTL_BOOK ? atEnd : atStart;
+    btnNext.disabled = RTL_BOOK ? atStart : atEnd;
+    btnFirst.disabled = atStart;
+    btnLast.disabled = atEnd;
+    gotoInput.max = pdfDoc.numPages;
+    pageSlider.max = pdfDoc.numPages;
+    pageSlider.value = lowNum;
+    // Yaad rakho ke reader kahan tak pahuncha tha (per-kitab).
+    try {
+      if (lowNum > 1) localStorage.setItem(POS_KEY, String(lowNum));
+      else localStorage.removeItem(POS_KEY);
+    } catch {}
+    rendering = false;
+  }
+
+  function goForward() {
+    if (!pdfDoc || rendering) return;
+    const { lowNum, highNum } = spreadPagesFor(currentPage);
+    const last = highNum || lowNum;
+    if (last >= pdfDoc.numPages) return;
+    renderSpread(last + 1, true);
+  }
+  function goBackward() {
+    if (!pdfDoc || rendering) return;
+    const { lowNum } = spreadPagesFor(currentPage);
+    if (lowNum <= 1) return;
+    renderSpread(lowNum - 1, false);
+  }
+  function jumpTo(num) {
+    if (!pdfDoc || rendering) return;
+    num = Math.max(1, Math.min(pdfDoc.numPages, num));
+    const dir = num === currentPage ? null : num > currentPage;
+    renderSpread(num, dir);
+  }
+
+  // Visually-left button = forward (deeper into book) for an RTL Urdu kitab.
+  btnPrev.addEventListener("click", () => (RTL_BOOK ? goForward() : goBackward()));
+  btnNext.addEventListener("click", () => (RTL_BOOK ? goBackward() : goForward()));
+  btnFirst.addEventListener("click", () => jumpTo(1));
+  btnLast.addEventListener("click", () => pdfDoc && jumpTo(pdfDoc.numPages));
+  gotoBtn.addEventListener("click", () => {
+    const n = parseInt(gotoInput.value, 10);
+    if (!isNaN(n)) jumpTo(n);
+  });
+  gotoInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      const n = parseInt(gotoInput.value, 10);
+      if (!isNaN(n)) jumpTo(n);
+    }
+  });
+  document.addEventListener("keydown", (e) => {
+    if (document.activeElement === gotoInput || document.activeElement === pageSlider) return;
+    if (e.key === "ArrowLeft") (RTL_BOOK ? goForward() : goBackward());
+    if (e.key === "ArrowRight") (RTL_BOOK ? goBackward() : goForward());
+    if (e.key === "Home") jumpTo(1);
+    if (e.key === "End" && pdfDoc) jumpTo(pdfDoc.numPages);
+    if (e.key === "+" || e.key === "=") setZoom(zoom + ZOOM_STEP);
+    if (e.key === "-" || e.key === "_") setZoom(zoom - ZOOM_STEP);
+    if (e.key === "0") setZoom(1);
+    if (e.key === "f" || e.key === "F") fsBtn.click();
+  });
+
+  loadBook();
+</script>
+</body>
+</html>

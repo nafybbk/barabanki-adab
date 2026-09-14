@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="hi" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ustad Sahab — Shayeri, Bazm-e-Aziz aur Barabanki</title>
+<meta name="description" content="Ustad Sahab ki shayeri, panch kitabon ka mutalea, shagirdon ki Bazm-e-Aziz, aur Barabanki shehr ka mukammal safarnama.">
+<meta name="theme-color" content="#5c1a1b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="assets/img/app-icon-192.png">
+<link rel="apple-touch-icon" href="assets/img/app-icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Naskh+Arabic:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css?v=8">
+</head>
+<body data-page="home">
+<div class="grain"></div>
+<div id="site-header"></div>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div>
+    <div class="hero-eyebrow">عزیز — بارہ بنکی</div>
+    <h1>Lafzon mein basi<br>ek zindagi ki dastan.</h1>
+    <p class="hero-sub" id="poet-tagline"></p>
+    <div class="hero-actions">
+      <a href="books/index.html" class="btn btn-primary">Kitabein padhein</a>
+      <a href="poetry/index.html" class="btn btn-ghost">Shayeri talaash karein</a>
+    </div>
+  </div>
+  <div class="hero-art">
+    <div class="hero-art-verse">
+      یہاں ایک نمائشی شعر<br>آئے گا مرکزی صفحے پر
+    </div>
+  </div>
+</section>
+
+<div class="divider-orn">۞</div>
+
+<!-- ================= POET INTRO ================= -->
+<section class="section" style="padding-top:0;">
+  <div class="grid-2" style="align-items:center;">
+    <div>
+      <div class="eyebrow">Taaruf</div>
+      <h2 style="font-size:34px; margin-bottom:20px;" id="poet-name-heading"></h2>
+      <p class="muted" id="poet-bio" style="font-size:16px;"></p>
+      <a href="bazm.html" class="btn btn-ghost" style="margin-top:20px;">Bazm-e-Aziz ke baare mein</a>
+    </div>
+    <div class="card" style="padding:0; overflow:hidden; aspect-ratio: 4/5; background: var(--maroon);">
+      <img id="poet-photo" src="" alt="Poet portrait" style="width:100%; height:100%; object-fit:cover;"
+           onerror="var p=this.parentElement; this.remove(); p.innerHTML='<div style=\'height:100%;display:flex;align-items:center;justify-content:center;color:var(--gold-pale);font-family:var(--font-nastaliq);font-size:22px;text-align:center;padding:30px;\'>تصویر جلد شامل ہوگی</div>'">
+    </div>
+  </div>
+</section>
+
+<!-- ================= FEATURED BOOKS ================= -->
+<section class="section section-tight">
+  <div class="eyebrow">Panch Kitabein</div>
+  <h2 style="font-size:32px; margin-bottom:36px;">Shaya-shuda majmuay</h2>
+  <div class="book-grid" id="book-grid"></div>
+  <div style="margin-top:36px;">
+    <a href="books/index.html" class="btn btn-ghost">Sab kitabein dekhein →</a>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ================= POETRY TEASER ================= -->
+<section class="section section-tight">
+  <div class="eyebrow">Namoona Kalaam</div>
+  <h2 style="font-size:32px; margin-bottom:30px;">Chand ashaar</h2>
+  <div id="poem-teaser"></div>
+  <a href="poetry/index.html" class="btn btn-gold">Poora deewan padhein</a>
+</section>
+
+<div class="divider"></div>
+
+<!-- ================= SHAGIRD TEASER ================= -->
+<section class="section section-tight">
+  <div class="grid-2" style="align-items:center;">
+    <div>
+      <div class="eyebrow">Bazm-e-Aziz</div>
+      <h2 style="font-size:30px; margin-bottom:16px;">Shagirdon ki mehfil mein shamil ho</h2>
+      <p class="muted" style="font-size:15px; margin-bottom:24px;">
+        Apni tehreerein, reels, aur tasveerein share karein — apne naam ke saath,
+        is adabi khandan ka hissa banein.
+      </p>
+      <a href="shagird/index.html" class="btn btn-primary">Bazm mein shamil hon</a>
+    </div>
+    <div class="card">
+      <div class="h-urdu" style="font-size:22px; margin-bottom:10px;">بزم عزیز</div>
+      <p class="muted" style="font-size:14px;" id="bazm-teaser"></p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ================= CITY TEASER ================= -->
+<section class="section section-tight">
+  <div class="eyebrow">Shehr-e-Barabanki</div>
+  <h2 style="font-size:32px; margin-bottom:16px;">Mitti jisne shayer paida kiye</h2>
+  <p class="muted" style="max-width:70ch; margin-bottom:30px;" id="city-intro-text"></p>
+  <div class="grid-4">
+    <a href="city/index.html" class="card" style="text-align:center;">📜<div style="margin-top:8px; font-family:var(--font-ui); font-weight:600;">Tareekh</div></a>
+    <a href="city/dargah.html" class="card" style="text-align:center;">🕌<div style="margin-top:8px; font-family:var(--font-ui); font-weight:600;">Dargah</div></a>
+    <a href="city/services.html" class="card" style="text-align:center;">🏥<div style="margin-top:8px; font-family:var(--font-ui); font-weight:600;">Khidmaat</div></a>
+    <a href="city/guide.html" class="card" style="text-align:center;">🏙️<div style="margin-top:8px; font-family:var(--font-ui); font-weight:600;">Guide</div></a>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="assets/js/data.js?v=8"></script>
+<script src="assets/js/components.js?v=8"></script>
+<script src="assets/js/chrome.js?v=8"></script>
+<script src="assets/js/i18n.js?v=8"></script>
+<script>
+  const { poet, bazm, city, books, poems } = SITE_DATA;
+
+  document.getElementById("poet-tagline").textContent = poet.tagline;
+  document.getElementById("poet-name-heading").innerHTML = `${poet.name} <span class="h-urdu" style="font-size:22px; display:block; margin-top:6px;">${poet.nameUrdu}</span>`;
+  document.getElementById("poet-bio").textContent = poet.bio;
+  document.getElementById("poet-photo").src = poet.photo;
+  document.getElementById("bazm-teaser").textContent = bazm.intro;
+  document.getElementById("city-intro-text").textContent = city.intro;
+
+  document.getElementById("book-grid").innerHTML = books.map(b => `
+    <a href="books/reader.html?id=${b.id}" class="book-card">
+      <div class="book-cover">
+        <img src="${b.cover}" alt="${b.title}" loading="lazy"
+             onerror="this.remove(); this.parentElement.classList.add('book-cover--fallback'); this.parentElement.setAttribute('data-title','${b.titleUrdu}')">
+        <div class="book-cover-spine"></div>
+      </div>
+      <div class="book-meta">
+        <div class="book-title-ur">${b.titleUrdu}</div>
+        <div class="book-title-en">${b.title} · ${b.year}</div>
+      </div>
+    </a>`).join("");
+
+  document.getElementById("poem-teaser").innerHTML = poems.slice(0, 2).map(p => `
+    <article class="poem-card">
+      <div class="poem-card-head">
+        <span class="pill">${p.book}</span>
+        <span class="muted" style="font-size:13px;">${p.title}</span>
+      </div>
+      <p class="poem-text">${p.textUrdu.replace(/\n/g, "<br>")}</p>
+    </article>`).join("");
+</script>
+</body>
+</html>

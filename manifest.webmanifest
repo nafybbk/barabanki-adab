@@ -1,0 +1,27 @@
+{
+  "name": "Bazm-e-Aziz — Barabanki Adab",
+  "short_name": "Bazm-e-Aziz",
+  "description": "Naseer Ansari Barabankvi — shayeri, kitabein, gallery aur Barabanki guide",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#2b0d0e",
+  "theme_color": "#5c1a1b",
+  "icons": [
+    { "src": "assets/img/app-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "assets/img/app-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "share_target": {
+    "action": "./share-target",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        { "name": "media", "accept": ["image/*", "application/pdf", "video/*"] }
+      ]
+    }
+  }
+}

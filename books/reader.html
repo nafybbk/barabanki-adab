@@ -142,7 +142,7 @@
     viewMode = mode;
     localStorage.setItem("adab-reader-view", mode);
     applyViewMode();
-    if (pdfDoc) renderSpread(currentPage, null);
+    if (pdfDoc) renderSpread(currentPage, null).then(centerZoomedView);
   }
   applyViewMode();
 
@@ -161,7 +161,15 @@
     zoomInBtn.disabled = zoom >= ZOOM_MAX;
     zoomOutBtn.disabled = zoom <= ZOOM_MIN;
     pageWrap.classList.toggle("is-zoomed", zoom > 1);
-    // Zoomed-in book grows leftward+rightward; keep it centred in the wrap.
+    centerZoomedView();
+  }
+  // Zoomed-in book grows leftward+rightward; keep it centred in the wrap.
+  // Also needs re-running after switching single/spread mode while already
+  // zoomed (real bug, 2026-09-15): the leaf count changes the book's total
+  // width, but applyZoom() only ran on the zoom buttons themselves, so the
+  // old scroll position (centred for the OLD width) was left stale and the
+  // book appeared shoved off to one side after a mode switch.
+  function centerZoomedView() {
     pageWrap.scrollLeft = (pageWrap.scrollWidth - pageWrap.clientWidth) / 2;
   }
   zoomInBtn.addEventListener("click", () => setZoom(zoom + ZOOM_STEP));

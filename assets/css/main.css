@@ -393,7 +393,18 @@ footer a:hover { color: var(--gold); }
 /* ============================================================
    Flipbook reader
    ============================================================ */
-.reader-shell { background: var(--maroon-deep); border-radius: 8px; padding: 32px; --leaf-h: 620px; --reader-zoom: 1; }
+/* Forced LTR (2026-09-15): when the site's language is Urdu, body[dir="rtl"]
+   (see i18n.js) cascades direction:rtl all the way down into this scroll
+   container. Browsers compute scrollLeft on an RTL-direction element with
+   completely different semantics (0 = rightmost edge, not leftmost, and
+   Chromium/Firefox even disagree with each other on the sign convention) —
+   the zoom-centering math below assumes plain LTR scrollLeft arithmetic, so
+   under RTL it lands near the right edge instead of centered. The reader's
+   pan/scroll mechanism is generic UI behavior, not Urdu text needing RTL
+   layout (the book PAGES are rendered as canvas images, unaffected by this
+   container's direction either way) — forcing ltr here removes the whole
+   class of bug regardless of the site's language setting. */
+.reader-shell { background: var(--maroon-deep); border-radius: 8px; padding: 32px; --leaf-h: 620px; --reader-zoom: 1; direction: ltr; }
 @media (max-width: 520px) { .reader-shell { --leaf-h: 400px; } }
 
 /* Fullscreen (Rekhta-style "poori screen" reading) */

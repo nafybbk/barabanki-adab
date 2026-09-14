@@ -115,8 +115,7 @@
 <script src="../assets/js/chrome.js?v=8"></script>
 <script src="../assets/js/i18n.js?v=8"></script>
 <script>
-  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-
+(function () {
   const params = new URLSearchParams(window.location.search);
   const bookId = params.get("id");
   const book = SITE_DATA.books.find(b => b.id === bookId) || SITE_DATA.books[0];
@@ -125,6 +124,25 @@
     `<span class="h-urdu">${book.titleUrdu}</span> <span class="muted" style="font-size:18px;">— ${book.title}</span>`;
   document.getElementById("book-desc").textContent = book.description;
   document.getElementById("download-link").href = "../" + book.pdf;
+
+  // Heyzine flipbook (2026-09-15): the hand-built PDF.js reader's zoom/pan/
+  // page-turn kept failing on real phones despite passing every check I
+  // could run from here — pinch-zoom, drag-to-pan and tap-to-turn all need
+  // real touchscreen behaviour that a desktop/emulated browser can't fully
+  // exercise. Per an explicit decision to stop iterating on custom gesture
+  // code and use an already-proven flipbook product instead: any book with
+  // a `heyzine` URL in data.js gets embedded here directly, full stop — the
+  // whole custom reader below never runs for it. Books without one keep
+  // using the custom reader until they're converted too.
+  if (book.heyzine) {
+    document.querySelector(".reader-shell").innerHTML = `
+      <iframe src="${book.heyzine}" title="${book.title} — flipbook"
+        style="width:100%; height:85vh; height:85svh; min-height:420px; border:0; display:block; background:#eee;"
+        loading="lazy" allowfullscreen></iframe>`;
+    return;
+  }
+
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
   const statusEl = document.getElementById("reader-status");
   const bookEl = document.getElementById("reader-book");
@@ -581,6 +599,7 @@
   });
 
   loadBook();
+})();
 </script>
 </body>
 </html>

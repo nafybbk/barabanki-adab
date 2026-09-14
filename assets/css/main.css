@@ -404,38 +404,61 @@ footer a:hover { color: var(--gold); }
    layout (the book PAGES are rendered as canvas images, unaffected by this
    container's direction either way) — forcing ltr here removes the whole
    class of bug regardless of the site's language setting. */
-.reader-shell { background: var(--maroon-deep); border-radius: 8px; padding: 32px; --leaf-h: 620px; --reader-zoom: 1; direction: ltr; }
-@media (max-width: 520px) { .reader-shell { --leaf-h: 400px; } }
+/* Immersive full-page reading (2026-09-15, replacing the old stacked-blocks
+   layout): the user's explicit ask was "sirf pages dikhna chahiye, saare
+   controls pages ke upar khaali jagah par" - only the book page should
+   fill the view, with every control floating in a compact overlay on top
+   of it instead of each taking its own dedicated row that shrinks the
+   actual reading area. --leaf-h now derives from the viewport instead of a
+   fixed px, since the "fixed-px only" rule this replaced existed purely to
+   stay in sync with NATIVE browser pinch-zoom - which reader.html's own
+   viewport meta tag now disables outright (see the user-scalable=no fix
+   above this file's HTML), so that concern no longer applies here. */
+.reader-shell { background: var(--maroon-deep); border-radius: 8px; padding: 0; --leaf-h: calc(100vh - 86px); --reader-zoom: 1; direction: ltr; position: relative; overflow: hidden; }
+@media (max-width: 520px) { .reader-shell { --leaf-h: calc(100vh - 78px); } }
 
 /* Fullscreen (Rekhta-style "poori screen" reading) */
-.reader-shell:fullscreen { border-radius: 0; padding: 20px 24px; display: flex; flex-direction: column; overflow: hidden; }
-.reader-shell:fullscreen .reader-page-wrap { flex: 1; max-height: none; }
+.reader-shell:fullscreen { border-radius: 0; }
+.reader-shell:fullscreen .reader-page-wrap { max-height: none; height: 100vh; }
 
-.reader-toolbar { display: flex; justify-content: center; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 18px; }
-.reader-view-toggle { display: flex; justify-content: center; gap: 8px; }
+/* Floating control overlay — sits ON TOP of the page (position:absolute),
+   never pushes it down. Semi-opaque gradient keeps buttons/text legible
+   over any page artwork underneath, fading to transparent so it still
+   reads as "floating over the page" rather than a solid opaque bar. */
+.reader-overlay {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 20;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 6px 8px 10px;
+  background: linear-gradient(to bottom, rgba(43,7,15,0.94), rgba(43,7,15,0.7) 75%, transparent);
+  pointer-events: none;
+}
+.reader-overlay > * { pointer-events: auto; }
+.reader-overlay-row { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; width: 100%; }
+
+.reader-view-toggle { display: flex; justify-content: center; gap: 6px; }
 .reader-view-toggle button {
   background: transparent; border: 1px solid rgba(255,255,255,0.25); color: var(--gold-pale);
-  font-family: var(--font-ui); font-size: 13px; padding: 6px 14px; border-radius: 20px; cursor: pointer;
+  font-family: var(--font-ui); font-size: 11px; padding: 3px 10px; border-radius: 16px; cursor: pointer;
 }
 .reader-view-toggle button.active { background: var(--gold); color: var(--maroon-deep); border-color: var(--gold); }
 
 /* In-app zoom controls */
-.reader-zoom { display: flex; align-items: center; gap: 6px; }
+.reader-zoom { display: flex; align-items: center; gap: 4px; }
 .reader-zoom button, .reader-fs-btn {
   background: transparent; border: 1px solid rgba(255,255,255,0.25); color: var(--gold-pale);
-  width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 16px;
+  width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 13px;
   font-family: var(--font-ui); line-height: 1; display: inline-flex; align-items: center; justify-content: center;
 }
 .reader-zoom button:hover:not(:disabled), .reader-fs-btn:hover { border-color: var(--gold); color: var(--gold); }
 .reader-zoom button:disabled { opacity: 0.3; cursor: not-allowed; }
-.reader-zoom .zoom-level { color: var(--gold-pale); font-family: var(--font-ui); font-size: 12px; min-width: 44px; text-align: center; }
+.reader-zoom .zoom-level { color: var(--gold-pale); font-family: var(--font-ui); font-size: 10px; min-width: 34px; text-align: center; }
 
 /* overflow:auto so the zoomed fixed-px book pans/scrolls inside the wrap
    instead of being clipped by the centered flex container
    (justify-content:center clips the leading edge of overflowing content
    with no way to scroll to it). max-height keeps the wrap at the un-zoomed
    book height so in-app zoom pans within the box rather than growing the page. */
-.reader-page-wrap { margin: 0 auto; position: relative; perspective: 2000px; overflow: auto; max-height: calc(var(--leaf-h) + 40px); touch-action: pan-y; }
+.reader-page-wrap { margin: 0 auto; position: relative; perspective: 2000px; overflow: auto; max-height: calc(var(--leaf-h) + 16px); touch-action: pan-y; }
 .reader-page-wrap.is-zoomed { cursor: grab; touch-action: none; }
 .reader-page-wrap.is-zoomed:active { cursor: grabbing; }
 .reader-book { display: flex; justify-content: center; align-items: flex-start; gap: 3px; width: max-content; min-width: 100%; margin: 0 auto; padding: 8px 0; }
@@ -520,31 +543,30 @@ footer a:hover { color: var(--gold); }
   15%  { opacity: 1; }
   100% { opacity: 0; transform: translate(var(--sdx), var(--sdy)) scale(1) rotate(var(--srot)); }
 }
-.reader-controls { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 22px; flex-wrap: wrap; }
+.reader-controls { display: flex; align-items: center; justify-content: center; gap: 6px; }
 .reader-controls button {
   background: var(--gold); color: var(--maroon-deep); border: none;
-  width: 44px; height: 44px; border-radius: 50%; font-size: 18px; cursor: pointer;
+  width: 26px; height: 26px; border-radius: 50%; font-size: 13px; cursor: pointer;
 }
-.reader-controls button.reader-jump-btn { width: 38px; height: 38px; font-size: 15px; opacity: 0.85; }
+.reader-controls button.reader-jump-btn { width: 22px; height: 22px; font-size: 10px; opacity: 0.85; }
 .reader-controls button:disabled { opacity: 0.3; cursor: not-allowed; }
 
 /* Page progress slider — dir="rtl" on the input so it advances
    right-to-left, matching how an Urdu kitab is read. */
-.reader-slider { margin-top: 18px; padding: 0 6px; display: flex; align-items: center; gap: 12px; }
-.reader-slider input { flex: 1; accent-color: var(--gold); cursor: pointer; min-width: 0; }
-.reader-slider .slider-label { color: var(--gold-pale); font-family: var(--font-ui); font-size: 12px; white-space: nowrap; opacity: 0.8; }
+.reader-slider { padding: 0 8px; display: flex; align-items: center; gap: 8px; width: 100%; max-width: 420px; }
+.reader-slider input { flex: 1; accent-color: var(--gold); cursor: pointer; min-width: 0; height: 16px; }
+.reader-slider .slider-label { color: var(--gold-pale); font-family: var(--font-ui); font-size: 10px; white-space: nowrap; opacity: 0.8; }
 
-.reader-goto { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; }
-.reader-goto label { color: var(--gold-pale); font-family: var(--font-ui); font-size: 13px; }
+.reader-goto { display: flex; align-items: center; justify-content: center; gap: 5px; }
 .reader-goto input {
-  width: 70px; padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.25);
-  background: rgba(255,255,255,0.06); color: var(--gold-pale); font-family: var(--font-ui); font-size: 14px; text-align: center;
+  width: 52px; padding: 3px 6px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.06); color: var(--gold-pale); font-family: var(--font-ui); font-size: 11px; text-align: center;
 }
 .reader-goto button {
   background: var(--gold); color: var(--maroon-deep); border: none;
-  padding: 6px 16px; border-radius: 20px; font-family: var(--font-ui); font-size: 13px; cursor: pointer;
+  padding: 3px 10px; border-radius: 16px; font-family: var(--font-ui); font-size: 11px; cursor: pointer;
 }
-.reader-page-num { color: var(--gold-pale); font-family: var(--font-ui); font-size: 15px; min-width: 90px; text-align: center; }
+.reader-page-num { color: var(--gold-pale); font-family: var(--font-ui); font-size: 11px; min-width: 60px; text-align: center; }
 
 /* ============================================================
    Adab Gallery (Cloudinary) + media embeds

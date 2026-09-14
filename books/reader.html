@@ -32,18 +32,38 @@
 
 <section class="section section-tight" style="padding-top:0;">
   <div class="reader-shell">
-    <div class="reader-toolbar">
-      <div class="reader-view-toggle" id="view-toggle">
-        <button type="button" data-mode="single" id="mode-single">Ek Safha</button>
-        <button type="button" data-mode="spread" id="mode-spread">Do Safhe (Kitab)</button>
+    <div class="reader-overlay">
+      <div class="reader-overlay-row">
+        <div class="reader-view-toggle" id="view-toggle">
+          <button type="button" data-mode="single" id="mode-single">Ek Safha</button>
+          <button type="button" data-mode="spread" id="mode-spread">Do Safhe</button>
+        </div>
+        <div class="reader-zoom" id="zoom-controls">
+          <button type="button" id="zoom-out" aria-label="Zoom kam karein" title="Zoom kam (−)">−</button>
+          <span class="zoom-level" id="zoom-level">100%</span>
+          <button type="button" id="zoom-in" aria-label="Zoom badhayein" title="Zoom zyada (+)">+</button>
+          <button type="button" id="zoom-reset" aria-label="Zoom reset" title="Zoom reset" style="font-size:11px;">⟲</button>
+        </div>
+        <button type="button" class="reader-fs-btn" id="btn-fullscreen" aria-label="Poori screen" title="Poori screen">⛶</button>
       </div>
-      <div class="reader-zoom" id="zoom-controls">
-        <button type="button" id="zoom-out" aria-label="Zoom kam karein" title="Zoom kam (−)">−</button>
-        <span class="zoom-level" id="zoom-level">100%</span>
-        <button type="button" id="zoom-in" aria-label="Zoom badhayein" title="Zoom zyada (+)">+</button>
-        <button type="button" id="zoom-reset" aria-label="Zoom reset" title="Zoom reset" style="font-size:13px;">⟲</button>
+      <div class="reader-overlay-row">
+        <div class="reader-controls">
+          <button id="btn-first" class="reader-jump-btn" aria-label="Pehla safha" title="Pehla safha">⇤</button>
+          <button id="btn-prev" aria-label="Agla safha">‹</button>
+          <div class="reader-page-num" id="page-num">— / —</div>
+          <button id="btn-next" aria-label="Pichla safha">›</button>
+          <button id="btn-last" class="reader-jump-btn" aria-label="Aakhri safha" title="Aakhri safha">⇥</button>
+        </div>
+        <div class="reader-goto">
+          <input type="number" id="goto-input" min="1" inputmode="numeric" placeholder="Safha #">
+          <button id="goto-btn" type="button">Jao</button>
+        </div>
       </div>
-      <button type="button" class="reader-fs-btn" id="btn-fullscreen" aria-label="Poori screen" title="Poori screen">⛶</button>
+      <div class="reader-slider">
+        <span class="slider-label">Aakhir</span>
+        <input type="range" id="page-slider" dir="rtl" min="1" max="1" value="1" aria-label="Safhon par phisalein">
+        <span class="slider-label">Shuru</span>
+      </div>
     </div>
     <div class="reader-page-wrap">
       <div class="reader-book" id="reader-book">
@@ -63,23 +83,6 @@
           <div class="sparkle-layer" id="sparkle-right"></div>
         </div>
       </div>
-    </div>
-    <div class="reader-controls">
-      <button id="btn-first" class="reader-jump-btn" aria-label="Pehla safha" title="Pehla safha">⇤</button>
-      <button id="btn-prev" aria-label="Agla safha">‹</button>
-      <div class="reader-page-num" id="page-num">— / —</div>
-      <button id="btn-next" aria-label="Pichla safha">›</button>
-      <button id="btn-last" class="reader-jump-btn" aria-label="Aakhri safha" title="Aakhri safha">⇥</button>
-    </div>
-    <div class="reader-slider">
-      <span class="slider-label">Aakhir</span>
-      <input type="range" id="page-slider" dir="rtl" min="1" max="1" value="1" aria-label="Safhon par phisalein">
-      <span class="slider-label">Shuru</span>
-    </div>
-    <div class="reader-goto">
-      <label for="goto-input">Safha par jaayein:</label>
-      <input type="number" id="goto-input" min="1" inputmode="numeric">
-      <button id="goto-btn" type="button">Jao</button>
     </div>
   </div>
 
@@ -246,8 +249,11 @@
   });
   function updateFsLeafHeight() {
     if (document.fullscreenElement === shellEl) {
-      // Book fills the screen minus toolbar/controls/slider chrome.
-      shellEl.style.setProperty("--leaf-h", Math.max(400, window.innerHeight - 235) + "px");
+      // Book fills the screen minus the floating overlay's own height (it
+      // no longer pushes the page down, just sits on top of it — 2026-09-15
+      // redesign — so this only needs to clear the overlay itself, not the
+      // old stacked toolbar+controls+slider blocks' combined height).
+      shellEl.style.setProperty("--leaf-h", Math.max(300, window.innerHeight - 90) + "px");
     } else {
       shellEl.style.removeProperty("--leaf-h");
     }

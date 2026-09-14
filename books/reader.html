@@ -2,7 +2,18 @@
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- user-scalable=no (reader page only — not the rest of the site): native
+     pinch-zoom bypasses this reader's own in-app zoom state entirely (it
+     only tracks +/- button / ctrl+wheel / keyboard zoom). A user pinch-
+     zooming natively leaves the app still thinking it's at 100%, so its
+     tap/swipe-to-turn-page logic (only meant to be active at 100%) stays
+     engaged instead of the drag-to-pan logic (only active when zoomed) -
+     confirmed real bug 2026-09-15: "touch moves the page = turns it,
+     dragging doesn't pan" is exactly what happens when native zoom and the
+     app's own zoom tracking disagree. The in-app zoom (up to 300%, via the
+     +/- buttons) already covers the same need, so funnelling all zooming
+     through it keeps the two in sync. -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Kitab Padhein</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -189,17 +200,26 @@
   pageWrap.addEventListener("pointerdown", (e) => {
     if (e.button !== 0 && e.pointerType === "mouse") return;
     ptr = { x: e.clientX, y: e.clientY, sl: pageWrap.scrollLeft, st: pageWrap.scrollTop, moved: false, id: e.pointerId };
-    if (zoom > 1) pageWrap.setPointerCapture(e.pointerId);
+    if (zoom > 1) {
+      // Real bug 2026-09-15: touch-action:none on .is-zoomed (below) should
+      // be enough on its own, but some mobile browsers still start their
+      // own native pan/scroll gesture on the first touch move regardless -
+      // explicit preventDefault forces JS to be the only thing driving the
+      // scroll position while zoomed, with no ambiguity.
+      e.preventDefault();
+      pageWrap.setPointerCapture(e.pointerId);
+    }
   });
   pageWrap.addEventListener("pointermove", (e) => {
     if (!ptr || e.pointerId !== ptr.id) return;
     const dx = e.clientX - ptr.x, dy = e.clientY - ptr.y;
     if (Math.abs(dx) > 8 || Math.abs(dy) > 8) ptr.moved = true;
     if (zoom > 1 && ptr.moved) {
+      e.preventDefault();
       pageWrap.scrollLeft = ptr.sl - dx;
       pageWrap.scrollTop = ptr.st - dy;
     }
-  });
+  }, { passive: false });
   pageWrap.addEventListener("pointerup", (e) => {
     if (!ptr || e.pointerId !== ptr.id) { ptr = null; return; }
     const dx = e.clientX - ptr.x;

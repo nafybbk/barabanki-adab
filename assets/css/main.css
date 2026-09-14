@@ -393,33 +393,33 @@ footer a:hover { color: var(--gold); }
 /* ============================================================
    Flipbook reader
    ============================================================ */
-/* Forced LTR (2026-09-15): when the site's language is Urdu, body[dir="rtl"]
-   (see i18n.js) cascades direction:rtl all the way down into this scroll
-   container. Browsers compute scrollLeft on an RTL-direction element with
-   completely different semantics (0 = rightmost edge, not leftmost, and
-   Chromium/Firefox even disagree with each other on the sign convention) —
-   the zoom-centering math below assumes plain LTR scrollLeft arithmetic, so
-   under RTL it lands near the right edge instead of centered. The reader's
-   pan/scroll mechanism is generic UI behavior, not Urdu text needing RTL
-   layout (the book PAGES are rendered as canvas images, unaffected by this
-   container's direction either way) — forcing ltr here removes the whole
-   class of bug regardless of the site's language setting. */
-/* Immersive full-page reading (2026-09-15, replacing the old stacked-blocks
-   layout): the user's explicit ask was "sirf pages dikhna chahiye, saare
-   controls pages ke upar khaali jagah par" - only the book page should
-   fill the view, with every control floating in a compact overlay on top
-   of it instead of each taking its own dedicated row that shrinks the
-   actual reading area. --leaf-h now derives from the viewport instead of a
-   fixed px, since the "fixed-px only" rule this replaced existed purely to
-   stay in sync with NATIVE browser pinch-zoom - which reader.html's own
-   viewport meta tag now disables outright (see the user-scalable=no fix
-   above this file's HTML), so that concern no longer applies here. */
-.reader-shell { background: var(--maroon-deep); border-radius: 8px; padding: 0; --leaf-h: calc(100vh - 86px); --reader-zoom: 1; direction: ltr; position: relative; overflow: hidden; }
-@media (max-width: 520px) { .reader-shell { --leaf-h: calc(100vh - 78px); } }
+/* Immersive full-page reading, transform-based zoom/pan (2026-09-15 full
+   rewrite, replacing two earlier attempts):
+   1. Only the book page should fill the view - every control floats in a
+      compact overlay on top of it (position:absolute) instead of each
+      taking its own dedicated row that shrinks the actual reading area.
+   2. Zoom/pan is now PURELY a CSS transform on .reader-zoom-layer
+      (translate+scale) - it never resizes leaf-wrap/reader-leaf, which stay
+      fixed size always. This is the real fix for the earlier centering bugs
+      (body[dir="rtl"] breaking scrollLeft-based centering under Urdu, and
+      switching single/spread mode leaving a stale scroll position): a
+      transform's translate() means the same thing regardless of the page's
+      text direction or how many leaves are present, so that whole class of
+      bug is gone rather than patched again. It also cleanly separates the
+      zoom/pan layer from the page-turn curl animation living deeper inside
+      it (.page-canvas) - nested transforms compose correctly with zero
+      interaction between the two.
+   3. --leaf-h and .reader-page-wrap's height are set by JS
+      (updateLayoutSize() in reader.html) as explicit measured px, not vh -
+      mobile browsers' 100vh includes the space behind their own
+      collapsible address bar, which isn't actually visible screen; a
+      vh-based guess reliably overshot the real available space on a real
+      phone. JS measures the overlay's actual current offsetHeight instead. */
+.reader-shell { background: var(--maroon-deep); border-radius: 8px; padding: 0; direction: ltr; position: relative; overflow: hidden; }
 
-/* Fullscreen (Rekhta-style "poori screen" reading) */
+/* Fullscreen (Rekhta-style "poori screen" reading) — updateLayoutSize()
+   re-measures on fullscreenchange, no separate CSS override needed. */
 .reader-shell:fullscreen { border-radius: 0; }
-.reader-shell:fullscreen .reader-page-wrap { max-height: none; height: 100vh; }
 
 /* Floating control overlay — sits ON TOP of the page (position:absolute),
    never pushes it down. Semi-opaque gradient keeps buttons/text legible
@@ -453,27 +453,25 @@ footer a:hover { color: var(--gold); }
 .reader-zoom button:disabled { opacity: 0.3; cursor: not-allowed; }
 .reader-zoom .zoom-level { color: var(--gold-pale); font-family: var(--font-ui); font-size: 10px; min-width: 34px; text-align: center; }
 
-/* overflow:auto so the zoomed fixed-px book pans/scrolls inside the wrap
-   instead of being clipped by the centered flex container
-   (justify-content:center clips the leading edge of overflowing content
-   with no way to scroll to it). max-height keeps the wrap at the un-zoomed
-   book height so in-app zoom pans within the box rather than growing the page. */
-.reader-page-wrap { margin: 0 auto; position: relative; perspective: 2000px; overflow: auto; max-height: calc(var(--leaf-h) + 16px); touch-action: pan-y; }
-.reader-page-wrap.is-zoomed { cursor: grab; touch-action: none; }
+/* .reader-page-wrap is the fixed-size "viewport" — height set by JS
+   (updateLayoutSize), overflow:hidden since panning is now a transform on
+   .reader-zoom-layer, never native scroll. touch-action:none unconditionally
+   (not just when zoomed) so the browser never intercepts a touch gesture
+   before JS decides whether it's a pan, a swipe-to-turn, or a tap. */
+.reader-page-wrap {
+  margin: 0 auto; position: relative; perspective: 2000px; overflow: hidden;
+  display: flex; align-items: center; justify-content: center; touch-action: none;
+}
+.reader-page-wrap.is-zoomed { cursor: grab; }
 .reader-page-wrap.is-zoomed:active { cursor: grabbing; }
-.reader-book { display: flex; justify-content: center; align-items: flex-start; gap: 3px; width: max-content; min-width: 100%; margin: 0 auto; padding: 8px 0; }
-/* The book must be sized in plain fixed px with NO viewport-tied sizing.
-   Both vh units AND max-height/max-width media queries re-evaluate when the
-   browser is zoomed (zoom shrinks the CSS viewport), which cancels the zoom
-   out and makes the book look frozen at one physical size while the rest of
-   the page scales. Fixed px is the only sizing that scales 1:1 with zoom.
-   The lone exception is the real-phone breakpoint on --leaf-h (see
-   .reader-shell): on desktop it only triggers at ~400%+ zoom, where
-   400px x 4 is still far larger than 620px, so zoom growth stays
-   monotonic and never appears frozen.
-   --reader-zoom is the IN-APP zoom level (buttons / ctrl+wheel), applied
-   here so the whole leaf (and the %-sized canvas inside) scales with it. */
-.leaf-wrap { position: relative; height: calc(var(--leaf-h, 620px) * var(--reader-zoom, 1)); }
+/* The one wrapper the zoom/pan transform ever touches. transform-origin
+   stays centered so scaling never shifts the content off-center by itself -
+   only an actual drag (via JS translate()) ever moves it. */
+.reader-zoom-layer { transform-origin: center center; will-change: transform; }
+.reader-book { display: flex; justify-content: center; align-items: flex-start; gap: 3px; padding: 8px 0; }
+/* Fixed size always — zoom no longer touches this at all, it's purely the
+   ancestor .reader-zoom-layer's transform now (see reader.html's JS). */
+.leaf-wrap { position: relative; height: var(--leaf-h, 620px); }
 .reader-leaf {
   /* box-sizing:border-box is required here — with the default content-box,
      aspect-ratio resolves against the content box and padding gets added
@@ -550,6 +548,15 @@ footer a:hover { color: var(--gold); }
 }
 .reader-controls button.reader-jump-btn { width: 22px; height: 22px; font-size: 10px; opacity: 0.85; }
 .reader-controls button:disabled { opacity: 0.3; cursor: not-allowed; }
+/* Mobile (2026-09-15, explicit ask): hide the ‹ › step buttons — tapping the
+   left/right half of the page already turns to the previous/next page (see
+   the Hammer "tap" handler in reader.html), so on a small screen these are
+   redundant with the gesture and just add clutter. ⇤/⇥ (first/last) stay,
+   since jumping straight to the start/end has no equivalent gesture. */
+@media (max-width: 520px) {
+  #btn-prev, #btn-next { display: none; }
+  .reader-controls { gap: 4px; }
+}
 
 /* Page progress slider — dir="rtl" on the input so it advances
    right-to-left, matching how an Urdu kitab is read. */

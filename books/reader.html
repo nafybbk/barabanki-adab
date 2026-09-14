@@ -19,6 +19,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/main.css?v=7">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<!-- Hammer.js: mature, battle-tested gesture recognizer (pinch/pan/tap) —
+     2026-09-15 replaces hand-rolled Pointer Event math for zoom/pan/tap.
+     Reason for the swap: the hand-rolled version only ever tracked ONE
+     pointer, so real two-finger pinch was never actually implemented (only
+     +/- buttons and ctrl+wheel worked) and had no defined behaviour for a
+     second finger landing mid-drag. Hammer's Pan recognizer requires exactly
+     1 pointer, so a second finger touching down cleanly ends any in-progress
+     pan and hands off to Pinch — the exact "accidental page-turn while
+     zooming" class of bug is handled by the library's own state machine
+     instead of more manual if-branches. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 </head>
 <body data-page="books">
 <div class="grain"></div>
@@ -33,19 +44,10 @@
 <section class="section section-tight" style="padding-top:0;">
   <div class="reader-shell">
     <div class="reader-overlay">
-      <div class="reader-overlay-row">
-        <div class="reader-view-toggle" id="view-toggle">
-          <button type="button" data-mode="single" id="mode-single">Ek Safha</button>
-          <button type="button" data-mode="spread" id="mode-spread">Do Safhe</button>
-        </div>
-        <div class="reader-zoom" id="zoom-controls">
-          <button type="button" id="zoom-out" aria-label="Zoom kam karein" title="Zoom kam (−)">−</button>
-          <span class="zoom-level" id="zoom-level">100%</span>
-          <button type="button" id="zoom-in" aria-label="Zoom badhayein" title="Zoom zyada (+)">+</button>
-          <button type="button" id="zoom-reset" aria-label="Zoom reset" title="Zoom reset" style="font-size:11px;">⟲</button>
-        </div>
-        <button type="button" class="reader-fs-btn" id="btn-fullscreen" aria-label="Poori screen" title="Poori screen">⛶</button>
-      </div>
+      <!-- Single always-visible strip (2026-09-15): the earlier 3-row
+           overlay ate too much of the actual page. Only nav + zoom + fs sit
+           here permanently; the mode-toggle/goto/slider (rarely touched)
+           move behind "⋯" so the default footprint is one thin bar. -->
       <div class="reader-overlay-row">
         <div class="reader-controls">
           <button id="btn-first" class="reader-jump-btn" aria-label="Pehla safha" title="Pehla safha">⇤</button>
@@ -54,33 +56,49 @@
           <button id="btn-next" aria-label="Pichla safha">›</button>
           <button id="btn-last" class="reader-jump-btn" aria-label="Aakhri safha" title="Aakhri safha">⇥</button>
         </div>
+        <div class="reader-zoom" id="zoom-controls">
+          <button type="button" id="zoom-out" aria-label="Zoom kam karein" title="Zoom kam (−)">−</button>
+          <span class="zoom-level" id="zoom-level">100%</span>
+          <button type="button" id="zoom-in" aria-label="Zoom badhayein" title="Zoom zyada (+)">+</button>
+          <button type="button" id="zoom-reset" aria-label="Zoom reset" title="Zoom reset" style="font-size:11px;">⟲</button>
+        </div>
+        <button type="button" class="reader-fs-btn" id="btn-fullscreen" aria-label="Poori screen" title="Poori screen">⛶</button>
+        <button type="button" class="reader-fs-btn" id="btn-more" aria-label="Aur options" title="Aur options">⋯</button>
+      </div>
+      <div class="reader-overlay-row" id="overlay-more" style="display:none;">
+        <div class="reader-view-toggle" id="view-toggle">
+          <button type="button" data-mode="single" id="mode-single">Ek Safha</button>
+          <button type="button" data-mode="spread" id="mode-spread">Do Safhe</button>
+        </div>
         <div class="reader-goto">
           <input type="number" id="goto-input" min="1" inputmode="numeric" placeholder="Safha #">
           <button id="goto-btn" type="button">Jao</button>
         </div>
       </div>
-      <div class="reader-slider">
+      <div class="reader-slider" id="overlay-slider" style="display:none;">
         <span class="slider-label">Aakhir</span>
         <input type="range" id="page-slider" dir="rtl" min="1" max="1" value="1" aria-label="Safhon par phisalein">
         <span class="slider-label">Shuru</span>
       </div>
     </div>
     <div class="reader-page-wrap">
-      <div class="reader-book" id="reader-book">
-        <div class="leaf-wrap">
-          <div class="reader-leaf" id="leaf-left">
-            <div style="color: var(--ink-soft); font-family: var(--font-ui); text-align:center;" id="reader-status">
-              Kitab load ho rahi hai&hellip;
+      <div class="reader-zoom-layer" id="zoom-layer">
+        <div class="reader-book" id="reader-book">
+          <div class="leaf-wrap">
+            <div class="reader-leaf" id="leaf-left">
+              <div style="color: var(--ink-soft); font-family: var(--font-ui); text-align:center;" id="reader-status">
+                Kitab load ho rahi hai&hellip;
+              </div>
+              <div class="reader-canvas-stack" id="stack-left"></div>
             </div>
-            <div class="reader-canvas-stack" id="stack-left"></div>
+            <div class="sparkle-layer" id="sparkle-left"></div>
           </div>
-          <div class="sparkle-layer" id="sparkle-left"></div>
-        </div>
-        <div class="leaf-wrap" id="leaf-wrap-right" style="display:none;">
-          <div class="reader-leaf reader-leaf--right" id="leaf-right">
-            <div class="reader-canvas-stack" id="stack-right"></div>
+          <div class="leaf-wrap" id="leaf-wrap-right" style="display:none;">
+            <div class="reader-leaf reader-leaf--right" id="leaf-right">
+              <div class="reader-canvas-stack" id="stack-right"></div>
+            </div>
+            <div class="sparkle-layer" id="sparkle-right"></div>
           </div>
-          <div class="sparkle-layer" id="sparkle-right"></div>
         </div>
       </div>
     </div>
@@ -126,12 +144,29 @@
   const modeSpreadBtn = document.getElementById("mode-spread");
   const shellEl = document.querySelector(".reader-shell");
   const pageWrap = document.querySelector(".reader-page-wrap");
+  const zoomLayer = document.getElementById("zoom-layer");
+  const overlayEl = document.querySelector(".reader-overlay");
   const zoomInBtn = document.getElementById("zoom-in");
   const zoomOutBtn = document.getElementById("zoom-out");
   const zoomResetBtn = document.getElementById("zoom-reset");
   const zoomLevelEl = document.getElementById("zoom-level");
   const fsBtn = document.getElementById("btn-fullscreen");
+  const moreBtn = document.getElementById("btn-more");
+  const overlayMore = document.getElementById("overlay-more");
+  const overlaySlider = document.getElementById("overlay-slider");
   const pageSlider = document.getElementById("page-slider");
+
+  // "⋯" reveals the rarely-used mode-toggle/goto/slider row. Collapsed by
+  // default so the overlay's resting footprint is one thin strip, per the
+  // explicit ask: only nav+zoom+fullscreen stay permanently visible.
+  let moreOpen = false;
+  moreBtn.addEventListener("click", () => {
+    moreOpen = !moreOpen;
+    overlayMore.style.display = moreOpen ? "flex" : "none";
+    overlaySlider.style.display = moreOpen ? "flex" : "none";
+    moreBtn.textContent = moreOpen ? "✕" : "⋯";
+    updateLayoutSize();
+  });
 
   // Urdu kitab hai — safhe RTL order mein palte hain: khulay panne mein
   // ZIYADA (aage ka) safha screen ke BAAYEIN (left) taraf hota hai, aur
@@ -156,40 +191,52 @@
     viewMode = mode;
     localStorage.setItem("adab-reader-view", mode);
     applyViewMode();
-    if (pdfDoc) renderSpread(currentPage, null).then(centerZoomedView);
+    panX = 0; panY = 0; applyTransform();
+    updateLayoutSize(); // leaf-height's width-fit depends on 1-leaf vs 2-leaf
+    if (pdfDoc) renderSpread(currentPage, null);
   }
   applyViewMode();
 
-  // ---- In-app zoom (buttons / ctrl+wheel) ----
+  // ---- In-app zoom/pan (2026-09-15 rewrite) ----
+  // Real architecture fix: zoom/pan is now PURELY a CSS transform on one
+  // wrapper (.reader-zoom-layer) - translate+scale, GPU-composited, never
+  // touching box-model sizing (leaf-wrap/reader-leaf are fixed size always).
+  // The page-turn curl animation lives on .page-canvas, several levels
+  // DEEPER inside that same wrapper - nested transforms compose correctly
+  // with zero interaction between the two, so zooming can never distort a
+  // mid-turn curl and turning a page can never fight the pan position.
+  // This also fully replaces the old scrollLeft-based centering, which
+  // depended on plain-LTR scroll semantics and broke under body[dir="rtl"]
+  // (Urdu mode) - a transform's translate() value means the same thing
+  // regardless of the page's text direction, so that whole class of bug is
+  // gone rather than patched.
   const ZOOM_MIN = 1, ZOOM_MAX = 3, ZOOM_STEP = 0.25;
-  let zoom = 1;
+  let zoom = 1, panX = 0, panY = 0;
   function setZoom(z) {
     z = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Math.round(z * 100) / 100));
     if (z === zoom) return;
     zoom = z;
+    panX = 0; panY = 0; // recentre on every explicit zoom change
     applyZoom();
   }
   function applyZoom() {
-    shellEl.style.setProperty("--reader-zoom", zoom);
     zoomLevelEl.textContent = Math.round(zoom * 100) + "%";
     zoomInBtn.disabled = zoom >= ZOOM_MAX;
     zoomOutBtn.disabled = zoom <= ZOOM_MIN;
     pageWrap.classList.toggle("is-zoomed", zoom > 1);
-    centerZoomedView();
+    applyTransform();
   }
-  // Zoomed-in book grows leftward+rightward; keep it centred in the wrap.
-  // Also needs re-running after switching single/spread mode while already
-  // zoomed (real bug, 2026-09-15): the leaf count changes the book's total
-  // width, but applyZoom() only ran on the zoom buttons themselves, so the
-  // old scroll position (centred for the OLD width) was left stale and the
-  // book appeared shoved off to one side after a mode switch.
-  function centerZoomedView() {
-    pageWrap.scrollLeft = (pageWrap.scrollWidth - pageWrap.clientWidth) / 2;
+  // translate() listed BEFORE scale() so the pan amount is in real, unscaled
+  // screen pixels — a 40px finger drag moves the content 40px on screen at
+  // ANY zoom level, matching the finger 1:1, rather than the drag distance
+  // itself getting scaled up/down by the zoom level.
+  function applyTransform() {
+    zoomLayer.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
   }
   zoomInBtn.addEventListener("click", () => setZoom(zoom + ZOOM_STEP));
   zoomOutBtn.addEventListener("click", () => setZoom(zoom - ZOOM_STEP));
   zoomResetBtn.addEventListener("click", () => setZoom(1));
-  applyZoom();
+  applyTransform();
 
   // Ctrl+scroll over the book zooms the book, not the whole page.
   pageWrap.addEventListener("wheel", (e) => {
@@ -198,73 +245,124 @@
     setZoom(zoom + (e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP));
   }, { passive: false });
 
-  // ---- Drag-to-pan when zoomed, swipe/tap page-turn when not ----
-  let ptr = null;
-  pageWrap.addEventListener("pointerdown", (e) => {
-    if (e.button !== 0 && e.pointerType === "mouse") return;
-    ptr = { x: e.clientX, y: e.clientY, sl: pageWrap.scrollLeft, st: pageWrap.scrollTop, moved: false, id: e.pointerId };
-    if (zoom > 1) {
-      // Real bug 2026-09-15: touch-action:none on .is-zoomed (below) should
-      // be enough on its own, but some mobile browsers still start their
-      // own native pan/scroll gesture on the first touch move regardless -
-      // explicit preventDefault forces JS to be the only thing driving the
-      // scroll position while zoomed, with no ambiguity.
-      e.preventDefault();
-      pageWrap.setPointerCapture(e.pointerId);
-    }
+  // ---- Gesture layer (Hammer.js) — three DISTINCT recognizers, kept
+  // deliberately separate rather than one blob of pointer-math:
+  //   Pinch  -> zoom (always live, 2 fingers)
+  //   Pan    -> drag-to-pan, but ONLY acted on while zoom > 1 (1 finger)
+  //   Tap    -> turn one page (only at zoom == 1)
+  // Pan requires exactly 1 pointer, so a second finger landing mid-drag
+  // ends the pan and Pinch takes over on its own — no manual bookkeeping
+  // needed for "accidental page-turn while zooming".
+  const mc = new Hammer.Manager(pageWrap, { touchAction: "none" });
+  const pinchRec = new Hammer.Pinch({ threshold: 0 });
+  const panRec = new Hammer.Pan({ direction: Hammer.DIRECTION_ALL, threshold: 10 });
+  const tapRec = new Hammer.Tap();
+  mc.add([pinchRec, panRec, tapRec]);
+  panRec.recognizeWith(pinchRec); // let both fire during a 2-finger touch
+
+  let pinchActive = false;
+  let gestureZoom0 = 1, gesturePanX0 = 0, gesturePanY0 = 0;
+
+  mc.on("pinchstart", () => {
+    pinchActive = true;
+    gestureZoom0 = zoom;
+    gesturePanX0 = panX;
+    gesturePanY0 = panY;
   });
-  pageWrap.addEventListener("pointermove", (e) => {
-    if (!ptr || e.pointerId !== ptr.id) return;
-    const dx = e.clientX - ptr.x, dy = e.clientY - ptr.y;
-    if (Math.abs(dx) > 8 || Math.abs(dy) > 8) ptr.moved = true;
-    if (zoom > 1 && ptr.moved) {
-      e.preventDefault();
-      pageWrap.scrollLeft = ptr.sl - dx;
-      pageWrap.scrollTop = ptr.st - dy;
-    }
-  }, { passive: false });
-  pageWrap.addEventListener("pointerup", (e) => {
-    if (!ptr || e.pointerId !== ptr.id) { ptr = null; return; }
-    const dx = e.clientX - ptr.x;
-    if (zoom === 1 && ptr.moved && Math.abs(dx) > 60) {
+  mc.on("pinch", (e) => {
+    // deltaX/deltaY track the pinch centre's own movement since gesture
+    // start, so the content follows the fingers while it scales — not just
+    // zooming in place around a fixed centre.
+    zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, gestureZoom0 * e.scale));
+    panX = gesturePanX0 + e.deltaX;
+    panY = gesturePanY0 + e.deltaY;
+    zoomLevelEl.textContent = Math.round(zoom * 100) + "%";
+    zoomInBtn.disabled = zoom >= ZOOM_MAX;
+    zoomOutBtn.disabled = zoom <= ZOOM_MIN;
+    pageWrap.classList.toggle("is-zoomed", zoom > 1);
+    applyTransform();
+  });
+  mc.on("pinchend pinchcancel", () => {
+    zoom = Math.round(zoom * 100) / 100;
+    if (zoom <= 1) { zoom = 1; panX = 0; panY = 0; pageWrap.classList.remove("is-zoomed"); applyTransform(); }
+    pinchActive = false;
+  });
+
+  mc.on("panstart", () => {
+    if (pinchActive) return;
+    gesturePanX0 = panX;
+    gesturePanY0 = panY;
+  });
+  mc.on("panmove", (e) => {
+    if (pinchActive || zoom <= 1) return; // at zoom==1, pan is left for panend's swipe check
+    panX = gesturePanX0 + e.deltaX;
+    panY = gesturePanY0 + e.deltaY;
+    applyTransform();
+  });
+  mc.on("panend pancancel", (e) => {
+    if (pinchActive) return;
+    if (zoom === 1 && Math.abs(e.deltaX) > 60 && Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
       // Swipe: RTL kitab mein agla safha baayein se aata hai,
       // isliye daayein taraf swipe = aage badhna.
-      if (dx > 0) (RTL_BOOK ? goForward() : goBackward());
-      else (RTL_BOOK ? goBackward() : goForward());
-    } else if (zoom === 1 && !ptr.moved && e.target.closest(".leaf-wrap")) {
-      // Tap/click on a page: left half = the visually-left button's action.
-      const rect = bookEl.getBoundingClientRect();
-      const leftHalf = e.clientX < rect.left + rect.width / 2;
-      if (leftHalf) (RTL_BOOK ? goForward() : goBackward());
+      if (e.deltaX > 0) (RTL_BOOK ? goForward() : goBackward());
       else (RTL_BOOK ? goBackward() : goForward());
     }
-    ptr = null;
   });
-  pageWrap.addEventListener("pointercancel", () => { ptr = null; });
+
+  mc.on("tap", (e) => {
+    if (zoom !== 1) return;
+    if (!e.target.closest(".leaf-wrap")) return;
+    // Tap on a page: left half = the visually-left button's action.
+    const rect = bookEl.getBoundingClientRect();
+    const leftHalf = e.center.x < rect.left + rect.width / 2;
+    if (leftHalf) (RTL_BOOK ? goForward() : goBackward());
+    else (RTL_BOOK ? goBackward() : goForward());
+  });
 
   // ---- Fullscreen ----
   fsBtn.addEventListener("click", () => {
     if (document.fullscreenElement) document.exitFullscreen();
     else if (shellEl.requestFullscreen) shellEl.requestFullscreen().catch(() => {});
   });
-  function updateFsLeafHeight() {
-    if (document.fullscreenElement === shellEl) {
-      // Book fills the screen minus the floating overlay's own height (it
-      // no longer pushes the page down, just sits on top of it — 2026-09-15
-      // redesign — so this only needs to clear the overlay itself, not the
-      // old stacked toolbar+controls+slider blocks' combined height).
-      shellEl.style.setProperty("--leaf-h", Math.max(300, window.innerHeight - 90) + "px");
-    } else {
-      shellEl.style.removeProperty("--leaf-h");
-    }
+  // Explicit px sizing measured from the REAL, currently-rendered overlay
+  // height (2026-09-15) rather than any vh-based guess: mobile browsers'
+  // 100vh famously includes the space behind their own collapsible address
+  // bar, which is not actually visible screen — a vh-based leaf height
+  // reliably overshot the real available space on a real phone (confirmed:
+  // the overlay measured far taller in practice than assumed, pushing the
+  // book mostly below the fold). Measuring offsetHeight directly and
+  // re-running on resize/fullscreenchange/orientation-change stays correct
+  // regardless of address-bar state or how many rows the overlay wraps to
+  // on a given device width.
+  function updateLayoutSize() {
+    const overlayH = overlayEl.offsetHeight;
+    const availH = Math.max(300, window.innerHeight - overlayH - 12);
+
+    // Height-only sizing (the original 2026-09-15 fix) still overflows
+    // sideways on a narrow-but-tall viewport: .reader-leaf is a fixed 3:4
+    // aspect ratio, so a height picked with no regard for available WIDTH
+    // can demand a leaf wider than the screen — confirmed empirically
+    // (349x957 test viewport produced a 653px-wide leaf inside a 349px-wide
+    // shell, overflowing both edges since .reader-page-wrap centers it).
+    // Spread mode shows two such leaves side by side, so it hits this ceiling
+    // at a taller/narrower viewport than single mode does.
+    const availW = Math.max(200, shellEl.clientWidth - 16);
+    const leavesAcross = viewMode === "spread" ? 2 : 1;
+    const gap = leavesAcross === 2 ? 3 : 0;
+    const maxHFromWidth = ((availW - gap) / leavesAcross) * (4 / 3);
+
+    const available = Math.min(availH, maxHFromWidth);
+    shellEl.style.setProperty("--leaf-h", available + "px");
+    pageWrap.style.height = (available + 16) + "px";
   }
   document.addEventListener("fullscreenchange", () => {
     const fs = document.fullscreenElement === shellEl;
     fsBtn.textContent = fs ? "✕" : "⛶";
     fsBtn.title = fs ? "Poori screen band karein" : "Poori screen";
-    updateFsLeafHeight();
+    updateLayoutSize();
   });
-  window.addEventListener("resize", updateFsLeafHeight);
+  window.addEventListener("resize", updateLayoutSize);
+  updateLayoutSize();
 
   // ---- Page slider (RTL) ----
   pageSlider.addEventListener("input", () => {
@@ -288,8 +386,10 @@
       // Pichhli baar jahan chhoda tha, wahin se kholo.
       const saved = parseInt(localStorage.getItem(POS_KEY), 10);
       const startPage = !isNaN(saved) && saved > 1 && saved <= pdfDoc.numPages ? saved : 1;
-      renderSpread(startPage, null);
+      await renderSpread(startPage, null);
     } catch (err) {
+      console.error("reader loadBook failed:", err);
+      statusEl.style.display = "";
       statusEl.innerHTML = `
         PDF abhi upload nahi hui hai.<br>
         <span style="font-size:13px; opacity:0.7;">(${book.pdf} is folder mein daalne ke baad kitab yahan khulegi)</span>

@@ -121,22 +121,35 @@
   document.getElementById("poet-tagline").textContent = poet.tagline;
   document.getElementById("poet-name-heading").innerHTML = `${poet.name} <span class="h-urdu" style="font-size:22px; display:block; margin-top:6px;">${poet.nameUrdu}</span>`;
   document.getElementById("poet-bio").textContent = poet.bio;
-  document.getElementById("poet-photo").src = poet.photo;
+  // Real bug (2026-09-15): the <img> starts with src="" in the static markup,
+  // which fires its own onerror handler almost immediately and REMOVES the
+  // element (see the onerror attribute above) — long before this script runs.
+  // Setting .src unconditionally on the now-missing element threw here and
+  // silently killed every statement below it (book-grid, poem-teaser,
+  // bazm-teaser, city-intro-text never ran) — that's why the whole rest of
+  // the homepage looked "empty", not because that code didn't exist.
+  const photoEl = document.getElementById("poet-photo");
+  if (photoEl) photoEl.src = poet.photo;
   document.getElementById("bazm-teaser").textContent = bazm.intro;
   document.getElementById("city-intro-text").textContent = city.intro;
 
-  document.getElementById("book-grid").innerHTML = books.map(b => `
-    <a href="books/reader.html?id=${b.id}" class="book-card">
+  document.getElementById("book-grid").innerHTML = books.map(b => {
+    const href = b.external ? b.external : `books/reader.html?id=${b.id}`;
+    const targetAttrs = b.external ? ` target="_blank" rel="noopener"` : "";
+    return `
+    <a href="${href}"${targetAttrs} class="book-card">
       <div class="book-cover">
         <img src="${b.cover}" alt="${b.title}" loading="lazy"
-             onerror="this.remove(); this.parentElement.classList.add('book-cover--fallback'); this.parentElement.setAttribute('data-title','${b.titleUrdu}')">
+             onerror="const p=this.parentElement; this.remove(); p.classList.add('book-cover--fallback'); p.setAttribute('data-title','${b.titleUrdu}')">
         <div class="book-cover-spine"></div>
+        ${b.external ? '<div class="book-cover-badge">Rekhta</div>' : ""}
       </div>
       <div class="book-meta">
         <div class="book-title-ur">${b.titleUrdu}</div>
         <div class="book-title-en">${b.title} · ${b.year}</div>
       </div>
-    </a>`).join("");
+    </a>`;
+  }).join("");
 
   document.getElementById("poem-teaser").innerHTML = poems.slice(0, 2).map(p => `
     <article class="poem-card">

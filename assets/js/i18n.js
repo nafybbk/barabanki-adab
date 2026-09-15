@@ -48,6 +48,9 @@ const UI_STRINGS = {
     bazmErr_PROFILE_MISSING: "Please complete your profile first", bazmErr_BAZM_PENDING: "This Bazm is still pending approval",
     bazmErr_BOHOT_ACCOUNTS: "Too many accounts from this device — please try again later",
     bazmErr_default: "Something went wrong, please try again",
+    bazmPostPlaceholder: "Write a comment, a sher, or a whole ghazal...", bazmPostBtn: "Post",
+    bazmPostEmpty: "No one has written here yet — be the first.", bazmViewPosts: "View & post",
+    bazmErr_MEMBER_NAHI: "Join this Bazm first to post",
   },
   hi: {
     home: "मुख्य पृष्ठ", books: "किताबें", poetry: "शायरी संग्रह", shagird: "शागिर्द मंडली",
@@ -88,6 +91,9 @@ const UI_STRINGS = {
     bazmErr_PROFILE_MISSING: "पहले अपनी प्रोफ़ाइल पूरी करें", bazmErr_BAZM_PENDING: "यह बज़्म अभी मंज़ूरी के इंतज़ार में है",
     bazmErr_BOHOT_ACCOUNTS: "इस डिवाइस से बहुत ज़्यादा अकाउंट बन चुके — कृपया बाद में कोशिश करें",
     bazmErr_default: "कुछ गड़बड़ हो गई, दोबारा कोशिश करें",
+    bazmPostPlaceholder: "कोई तब्सेरा, शेर, या पूरी ग़ज़ल लिखें...", bazmPostBtn: "भेजें",
+    bazmPostEmpty: "अभी तक किसी ने कुछ नहीं लिखा — सबसे पहले आप लिखें।", bazmViewPosts: "देखें और लिखें",
+    bazmErr_MEMBER_NAHI: "पोस्ट करने के लिए पहले इस बज़्म में शामिल हों",
   },
   ur: {
     home: "صفحہ اول", books: "کتابیں", poetry: "شاعری آرکائیو", shagird: "شاگرد حلقہ",
@@ -128,6 +134,9 @@ const UI_STRINGS = {
     bazmErr_PROFILE_MISSING: "پہلے اپنی پروفائل مکمل کریں", bazmErr_BAZM_PENDING: "یہ بزم ابھی منظوری کے انتظار میں ہے",
     bazmErr_BOHOT_ACCOUNTS: "اس ڈیوائس سے بہت زیادہ اکاؤنٹس بن چکے — براہ کرم بعد میں کوشش کریں",
     bazmErr_default: "کچھ گڑبڑ ہو گئی، دوبارہ کوشش کریں",
+    bazmPostPlaceholder: "کوئی تبصرہ، شعر، یا پوری غزل لکھیں۔۔۔", bazmPostBtn: "بھیجیں",
+    bazmPostEmpty: "ابھی تک کسی نے کچھ نہیں لکھا — سب سے پہلے آپ لکھیں۔", bazmViewPosts: "دیکھیں اور لکھیں",
+    bazmErr_MEMBER_NAHI: "پوسٹ کرنے کے لیے پہلے اس بزم میں شامل ہوں",
   },
 };
 

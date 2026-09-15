@@ -102,14 +102,20 @@ async function mountBazmDirectory(containerId) {
       const joined = myBazmIds.has(b.id);
       const count = memberCounts[b.id] || 0;
       return `
-        <div class="bazm-dir-card">
-          <div>
-            <div class="bazm-dir-card-name">${escapeHtmlAD(nameField)}</div>
-            <div class="bazm-dir-card-meta">${count} ${t.bazmMembers}</div>
+        <div>
+          <div class="bazm-dir-card">
+            <div>
+              <div class="bazm-dir-card-name">${escapeHtmlAD(nameField)}</div>
+              <div class="bazm-dir-card-meta">${count} ${t.bazmMembers}</div>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="btn btn-ghost bazm-toggle-posts-btn" data-id="${b.id}">${t.bazmViewPosts}</button>
+              <button class="btn ${joined ? "btn-ghost" : "btn-primary"} bazm-join-btn" data-id="${b.id}" data-joined="${joined}">
+                ${joined ? t.bazmLeaveBtn : t.bazmJoinBtn}
+              </button>
+            </div>
           </div>
-          <button class="btn ${joined ? "btn-ghost" : "btn-primary"} bazm-join-btn" data-id="${b.id}" data-joined="${joined}">
-            ${joined ? t.bazmLeaveBtn : t.bazmJoinBtn}
-          </button>
+          <div class="bazm-post-list" id="bazm-posts-${b.id}" hidden data-joined="${joined}"></div>
         </div>`;
     }).join("") || `<div class="bazm-empty">—</div>`;
 
@@ -160,6 +166,63 @@ async function mountBazmDirectory(containerId) {
         } catch (e) {
           alert(bazmDirErrorText(e.message, t));
         }
+      };
+    });
+
+    async function renderPosts(bazmId) {
+      const panel = document.getElementById(`bazm-posts-${bazmId}`);
+      if (!panel) return;
+      const joined = panel.getAttribute("data-joined") === "true";
+      panel.innerHTML = `<div class="bazm-loading muted">${t.bzLoading}</div>`;
+      let posts = [];
+      try {
+        posts = await AdabAuth.publicRead(`adab_bazm_posts?bazm_id=eq.${bazmId}&select=id,display_name,content,created_at&order=created_at.desc`);
+      } catch {}
+      const postsHtml = posts.length
+        ? posts.map((p) => `
+            <div class="bazm-post">
+              <div class="bazm-post-head">
+                <span class="bazm-post-name">${escapeHtmlAD(p.display_name)}</span>
+                <span class="bazm-post-time">${escapeHtmlAD(bazmRelativeTime(p.created_at, LangStore.get()))}</span>
+              </div>
+              <div class="bazm-post-content">${escapeHtmlAD(p.content).replace(/\n/g, "<br>")}</div>
+            </div>`).join("")
+        : `<div class="bazm-empty muted">${t.bazmPostEmpty}</div>`;
+      const composeHtml = joined
+        ? `<div style="margin-top:14px;">
+             <textarea class="bazm-textarea" id="bazm-new-post-${bazmId}" placeholder="${t.bazmPostPlaceholder}"></textarea>
+             <button class="btn btn-gold bazm-btn bazm-send-btn" id="bazm-send-${bazmId}">${t.bazmPostBtn}</button>
+             <div id="bazm-post-error-${bazmId}"></div>
+           </div>`
+        : "";
+      panel.innerHTML = postsHtml + composeHtml;
+      const sendBtn = document.getElementById(`bazm-send-${bazmId}`);
+      if (sendBtn) {
+        sendBtn.onclick = async () => {
+          const textarea = document.getElementById(`bazm-new-post-${bazmId}`);
+          const errEl = document.getElementById(`bazm-post-error-${bazmId}`);
+          errEl.innerHTML = "";
+          sendBtn.disabled = true;
+          try {
+            await AdabAuth.rpc("adab_add_bazm_post", { p_bazm_id: bazmId, p_content: textarea.value });
+            textarea.value = "";
+            await renderPosts(bazmId);
+          } catch (e) {
+            errEl.innerHTML = `<div class="bazm-error">${bazmDirErrorText(e.message, t)}</div>`;
+          } finally {
+            sendBtn.disabled = false;
+          }
+        };
+      }
+    }
+
+    el.querySelectorAll(".bazm-toggle-posts-btn").forEach((btn) => {
+      btn.onclick = () => {
+        const id = btn.getAttribute("data-id");
+        const panel = document.getElementById(`bazm-posts-${id}`);
+        if (!panel) return;
+        panel.hidden = !panel.hidden;
+        if (!panel.hidden) renderPosts(id);
       };
     });
 

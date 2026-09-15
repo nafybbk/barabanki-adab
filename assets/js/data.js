@@ -93,13 +93,23 @@ const SITE_DATA_DEFAULT = {
     // { url: "https://www.youtube.com/watch?v=XXXX", title: "Mushaira 2024" },
   ],
 
+  // 2026-09-15: transcribed by hand from Deewan-e-Naseer (2023), page 40 —
+  // the PDF has no extractable text layer (scanned/rasterized print), so
+  // this was read directly off the page image and typed out. Flagged to
+  // the user for verification against the physical book; replace/correct
+  // as needed once checked.
   poems: [
     {
-      id: "p1", book: "Pehli Kitab", title: "Namoona Ghazal",
-      text: "Yahan sher ka namoona rahega\nJab tak asli matn shamil na ho",
-      textUrdu: "یہاں شعر کا نمونہ رہے گا\nجب تک اصل متن شامل نہ ہو",
-      textHindi: "यहाँ शेर का नमूना रहेगा\nजब तक असल मतन शामिल न हो",
-      tags: ["ghazal", "namoona"],
+      id: "p1", book: "Deewan-e-Naseer", title: "Ghazal",
+      text: "Maghroor na ho ke paaon na rakhoon zameen par\nYarab na dena tanhi bhi oonchaiyan mujhe\n\nKahan kahan pe tazeem sar jhukaye koi\nJagah jagah pe wo jalwa-numa lage hai mujhe\n\nHai tere husn mein husn-e-khuda ki aamezish\nKabhi to banda kabhi to khuda lage hai mujhe\n\nJin mein na-paak kamaai ki na ho aamezish\nYa khuda de to faqat aise nawale mujh ko",
+      textUrdu: "مغرور نہ ہو کہ پاؤں نہ رکھوں زمین پر\nیارب نہ دینا تنہا بھی اونچائیاں مجھے\n\nکہاں کہاں پہ تعظیم سر جھکائے کوئی\nجگہ جگہ پہ وہ جلوہ نما لگے ہے مجھے\n\nہے تیرے حسن میں حسنِ خدا کی آمیزش\nکبھی تو بندہ کبھی تو خدا لگے ہے مجھے\n\nجن میں ناپاک کمائی کی نہ ہو آمیزش\nیا خدا دے تو فقط ایسے نوالے مجھ کو",
+      tags: ["ghazal", "naseer-ansari"],
+    },
+    {
+      id: "p2", book: "Deewan-e-Naseer", title: "Qita",
+      text: "Hai laazim aadmi mein aadmiyat\nBaghair us ke nahin hai aadmi kuch\n\nMohabbat kar ke saari umr dil par kya guzarti hai\nJise maloom karna ho ke aa kar mil hamare se",
+      textUrdu: "ہے لازم آدمی میں آدمیت\nبغیر اس کے نہیں ہے آدمی کچھ\n\nمحبت کر کے ساری عمر دل پر کیا گزرتی ہے\nجسے معلوم کرنا ہو کہ آ کر مل ہمارے سے",
+      tags: ["qita", "naseer-ansari"],
     },
   ],
 

@@ -727,3 +727,24 @@ footer a:hover { color: var(--gold); }
    visually points the reading direction rather than always pointing right. */
 .dir-arrow { display: inline-block; }
 [dir="rtl"] .dir-arrow { transform: scaleX(-1); }
+
+/* ============================================================
+   Bazm directory (list of Bazms, join/leave, create-new, approval)
+   ============================================================ */
+.bazm-dir-list { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }
+.bazm-dir-card {
+  background: var(--paper); border-radius: 10px; padding: 16px 18px; border: 1px solid var(--paper-line);
+  display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+}
+.bazm-dir-card-name { font-weight: 600; color: var(--maroon-deep); font-size: 16px; }
+.bazm-dir-card-meta { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+.bazm-badge-pending {
+  display: inline-block; font-size: 12px; padding: 3px 10px; border-radius: 20px;
+  background: rgba(185,138,52,0.14); color: var(--maroon-deep); border: 1px solid var(--gold);
+}
+.bazm-whatsapp-btn {
+  display: inline-flex; align-items: center; gap: 6px; background: #25D366; color: #fff;
+  padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none;
+  min-height: 46px; justify-content: center;
+}
+.bazm-create-form { margin-top: 20px; padding: 16px; border: 1px dashed var(--paper-line); border-radius: 10px; }

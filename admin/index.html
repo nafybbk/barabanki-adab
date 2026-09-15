@@ -51,6 +51,7 @@
       <button class="admin-nav-item" data-tab="books">📚 Kitabein &amp; Flipbooks</button>
       <button class="admin-nav-item" data-tab="poetry">✒️ Shayeri Archive</button>
       <button class="admin-nav-item" data-tab="shagird">👥 Shagird &amp; Posts</button>
+      <button class="admin-nav-item" data-tab="bazms">🕌 Bazm Approvals</button>
       <button class="admin-nav-item" data-tab="gallery">🖼️ Gallery &amp; Media</button>
       <button class="admin-nav-item" data-tab="city">🕌 Barabanki Guide</button>
       <button class="admin-nav-item" data-tab="settings">⚙️ Settings</button>
@@ -159,6 +160,21 @@
         <div class="admin-card">
           <h3>Sab Posts</h3>
           <div id="shagird-posts-list"></div>
+        </div>
+      </section>
+
+      <!-- ===== BAZM APPROVALS ===== -->
+      <section class="admin-tab" id="tab-bazms" style="display:none;">
+        <h1>Bazm Approvals</h1>
+        <p class="muted" style="margin-bottom:20px;">
+          Koi bhi user nayi Bazm bana sakta hai — yahan se approve/reject
+          karein taake wo sab ko dikhne lage. Approve karne ke liye apne
+          Google account (jo <code>adab_admins</code> mein hai) se sign in
+          karein.
+        </p>
+        <div class="admin-card">
+          <div id="bazm-approval-login"></div>
+          <div id="bazm-approval-list"></div>
         </div>
       </section>
 
@@ -303,9 +319,11 @@
   </div>
 </div>
 
-<script src="../assets/js/data.js?v=11"></script>
-<script src="../assets/js/media-hub.js?v=11"></script>
+<script src="../assets/js/data.js?v=12"></script>
+<script src="../assets/js/media-hub.js?v=12"></script>
+<script src="../assets/js/auth.js?v=12"></script>
 <script src="auth.js"></script>
 <script src="admin.js"></script>
+<script src="bazm-approvals.js?v=12"></script>
 </body>
 </html>

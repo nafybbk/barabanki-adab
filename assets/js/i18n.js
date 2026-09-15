@@ -11,21 +11,21 @@
 const UI_STRINGS = {
   en: {
     home: "Home", books: "Books", poetry: "Poetry Archive", shagird: "Shagird Circle",
-    bazm: "Bazm-e-Aziz", city: "Barabanki Guide", gallery: "Gallery",
+    bazm: "Bazm-e-Aziz", city: "Barabanki Guide", gallery: "Gallery", apps: "Apps",
     readBooks: "Read Books", searchPoetry: "Search Poetry",
     aboutTitle: "About", joinBazm: "Join Bazm-e-Aziz",
     footerTagline: "Preserving verse, discipleship, and the spirit of Barabanki.",
   },
   hi: {
     home: "मुख्य पृष्ठ", books: "किताबें", poetry: "शायरी संग्रह", shagird: "शागिर्द मंडली",
-    bazm: "बज़्म-ए-अज़ीज़", city: "बाराबंकी गाइड", gallery: "गैलरी",
+    bazm: "बज़्म-ए-अज़ीज़", city: "बाराबंकी गाइड", gallery: "गैलरी", apps: "ऐप्स",
     readBooks: "किताबें पढ़ें", searchPoetry: "शायरी खोजें",
     aboutTitle: "परिचय", joinBazm: "बज़्म-ए-अज़ीज़ में शामिल हों",
     footerTagline: "शायरी, शागिर्दी और बाराबंकी की रूह को महफ़ूज़ रखने की एक कोशिश।",
   },
   ur: {
     home: "صفحہ اول", books: "کتابیں", poetry: "شاعری آرکائیو", shagird: "شاگرد حلقہ",
-    bazm: "بزم عزیز", city: "بارہ بنکی گائیڈ", gallery: "گیلری",
+    bazm: "بزم عزیز", city: "بارہ بنکی گائیڈ", gallery: "گیلری", apps: "ایپس",
     readBooks: "کتابیں پڑھیں", searchPoetry: "شاعری تلاش کریں",
     aboutTitle: "تعارف", joinBazm: "بزم عزیز میں شامل ہوں",
     footerTagline: "شاعری، شاگردی اور بارہ بنکی کی روح کو محفوظ رکھنے کی ایک کوشش۔",

@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { href: "/gallery/index.html", key: "gallery", ui: "gallery" },
   { href: "/bazm.html", key: "bazm", ui: "bazm" },
   { href: "/city/index.html", key: "city", ui: "city" },
+  { href: "/apps/index.html", key: "apps", ui: "apps" },
 ];
 
 function resolveHref(href) {

@@ -21,11 +21,11 @@
 <section class="hero">
   <div>
     <div class="hero-eyebrow">عزیز — بارہ بنکی</div>
-    <h1>Lafzon mein basi<br>ek zindagi ki dastan.</h1>
+    <h1 data-ui="heroHeading"></h1>
     <p class="hero-sub" id="poet-tagline"></p>
     <div class="hero-actions">
-      <a href="books/index.html" class="btn btn-primary">Kitabein padhein</a>
-      <a href="poetry/index.html" class="btn btn-ghost">Shayeri talaash karein</a>
+      <a href="books/index.html" class="btn btn-primary" data-ui="readBooks"></a>
+      <a href="poetry/index.html" class="btn btn-ghost" data-ui="searchPoetry"></a>
     </div>
   </div>
   <div class="hero-art">
@@ -41,10 +41,10 @@
 <section class="section" style="padding-top:0;">
   <div class="grid-2" style="align-items:center;">
     <div>
-      <div class="eyebrow">Taaruf</div>
+      <div class="eyebrow" data-ui="aboutTitle"></div>
       <h2 style="font-size:34px; margin-bottom:20px;" id="poet-name-heading"></h2>
       <p class="muted" id="poet-bio" style="font-size:16px;"></p>
-      <a href="bazm.html" class="btn btn-ghost" style="margin-top:20px;">Bazm-e-Aziz ke baare mein</a>
+      <a href="bazm.html" class="btn btn-ghost" style="margin-top:20px;" data-ui="aboutBazmLink"></a>
     </div>
     <div class="card" style="padding:0; overflow:hidden; aspect-ratio: 4/5; background: var(--maroon);">
       <img id="poet-photo" src="" alt="Poet portrait" style="width:100%; height:100%; object-fit:cover;"
@@ -55,11 +55,11 @@
 
 <!-- ================= FEATURED BOOKS ================= -->
 <section class="section section-tight">
-  <div class="eyebrow">Panch Kitabein</div>
-  <h2 style="font-size:32px; margin-bottom:36px;">Shaya-shuda majmuay</h2>
+  <div class="eyebrow" data-ui="featuredBooksEyebrow"></div>
+  <h2 style="font-size:32px; margin-bottom:36px;" data-ui="publishedBooksHeading"></h2>
   <div class="book-grid" id="book-grid"></div>
   <div style="margin-top:36px;">
-    <a href="books/index.html" class="btn btn-ghost">Sab kitabein dekhein →</a>
+    <a href="books/index.html" class="btn btn-ghost"><span data-ui="allBooksLink"></span> <span class="dir-arrow">→</span></a>
   </div>
 </section>
 
@@ -67,10 +67,10 @@
 
 <!-- ================= POETRY TEASER ================= -->
 <section class="section section-tight">
-  <div class="eyebrow">Namoona Kalaam</div>
-  <h2 style="font-size:32px; margin-bottom:30px;">Chand ashaar</h2>
+  <div class="eyebrow" data-ui="namoonaKalaamEyebrow"></div>
+  <h2 style="font-size:32px; margin-bottom:30px;" data-ui="chandAshaarHeading"></h2>
   <div id="poem-teaser"></div>
-  <a href="poetry/index.html" class="btn btn-gold">Poora deewan padhein</a>
+  <a href="poetry/index.html" class="btn btn-gold" data-ui="pooraDeewanLink"></a>
 </section>
 
 <div class="divider"></div>
@@ -79,13 +79,10 @@
 <section class="section section-tight">
   <div class="grid-2" style="align-items:center;">
     <div>
-      <div class="eyebrow">Bazm-e-Aziz</div>
-      <h2 style="font-size:30px; margin-bottom:16px;">Shagirdon ki mehfil mein shamil ho</h2>
-      <p class="muted" style="font-size:15px; margin-bottom:24px;">
-        Apni tehreerein, reels, aur tasveerein share karein — apne naam ke saath,
-        is adabi khandan ka hissa banein.
-      </p>
-      <a href="shagird/index.html" class="btn btn-primary">Bazm mein shamil hon</a>
+      <div class="eyebrow" data-ui="bazm"></div>
+      <h2 style="font-size:30px; margin-bottom:16px;" data-ui="shagirdHeading"></h2>
+      <p class="muted" style="font-size:15px; margin-bottom:24px;" data-ui="shagirdBody"></p>
+      <a href="shagird/index.html" class="btn btn-primary" data-ui="joinBazm"></a>
     </div>
     <div class="card">
       <div class="h-urdu" style="font-size:22px; margin-bottom:10px;">بزم عزیز</div>
@@ -98,14 +95,14 @@
 
 <!-- ================= CITY TEASER ================= -->
 <section class="section section-tight">
-  <div class="eyebrow">Shehr-e-Barabanki</div>
-  <h2 style="font-size:32px; margin-bottom:16px;">Mitti jisne shayer paida kiye</h2>
+  <div class="eyebrow" data-ui="cityEyebrow"></div>
+  <h2 style="font-size:32px; margin-bottom:16px;" data-ui="citySoilHeading"></h2>
   <p class="muted" style="max-width:70ch; margin-bottom:30px;" id="city-intro-text"></p>
   <div class="grid-4">
-    <a href="city/index.html" class="card" style="text-align:center;">📜<div style="margin-top:8px; font-family:var(--font-ui); font-weight:600;">Tareekh</div></a>
-    <a href="city/dargah.html" class="card" style="text-align:center;">🕌<div style="margin-top:8px; font-family:var(--font-ui); font-weight:600;">Dargah</div></a>
-    <a href="city/services.html" class="card" style="text-align:center;">🏥<div style="margin-top:8px; font-family:var(--font-ui); font-weight:600;">Khidmaat</div></a>
-    <a href="city/guide.html" class="card" style="text-align:center;">🏙️<div style="margin-top:8px; font-family:var(--font-ui); font-weight:600;">Guide</div></a>
+    <a href="city/index.html" class="card" style="text-align:center;">📜<div style="margin-top:8px; font-family:var(--font-ui); font-weight:600;" data-ui="cityTareekh"></div></a>
+    <a href="city/dargah.html" class="card" style="text-align:center;">🕌<div style="margin-top:8px; font-family:var(--font-ui); font-weight:600;" data-ui="cityDargah"></div></a>
+    <a href="city/services.html" class="card" style="text-align:center;">🏥<div style="margin-top:8px; font-family:var(--font-ui); font-weight:600;" data-ui="cityKhidmaat"></div></a>
+    <a href="city/guide.html" class="card" style="text-align:center;">🏙️<div style="margin-top:8px; font-family:var(--font-ui); font-weight:600;" data-ui="cityGuideCard"></div></a>
   </div>
 </section>
 
@@ -118,9 +115,7 @@
 <script>
   const { poet, bazm, city, books, poems } = SITE_DATA;
 
-  document.getElementById("poet-tagline").textContent = poet.tagline;
   document.getElementById("poet-name-heading").innerHTML = `${poet.name} <span class="h-urdu" style="font-size:22px; display:block; margin-top:6px;">${poet.nameUrdu}</span>`;
-  document.getElementById("poet-bio").textContent = poet.bio;
   // Real bug (2026-09-15): the <img> starts with src="" in the static markup,
   // which fires its own onerror handler almost immediately and REMOVES the
   // element (see the onerror attribute above) — long before this script runs.
@@ -130,8 +125,6 @@
   // the homepage looked "empty", not because that code didn't exist.
   const photoEl = document.getElementById("poet-photo");
   if (photoEl) photoEl.src = poet.photo;
-  document.getElementById("bazm-teaser").textContent = bazm.intro;
-  document.getElementById("city-intro-text").textContent = city.intro;
 
   document.getElementById("book-grid").innerHTML = books.map(b => {
     const href = b.external ? b.external : `books/reader.html?id=${b.id}`;
@@ -151,14 +144,28 @@
     </a>`;
   }).join("");
 
-  document.getElementById("poem-teaser").innerHTML = poems.slice(0, 2).map(p => `
-    <article class="poem-card">
-      <div class="poem-card-head">
-        <span class="pill">${p.book}</span>
-        <span class="muted" style="font-size:13px;">${p.title}</span>
-      </div>
-      <p class="poem-text">${p.textUrdu.replace(/\n/g, "<br>")}</p>
-    </article>`).join("");
+  // Real bug (2026-09-15): tagline/bio/intro/poem text always used the base
+  // (English) SITE_DATA field, regardless of the selected language — the
+  // Urdu/Hindi fields (taglineUrdu, bioHindi, etc.) already existed in
+  // data.js but nothing ever read them. fieldForLang() (i18n.js) picks the
+  // right field per language; this now re-runs on every language switch via
+  // the renderPageContent hook, same pattern as the Bazm widget uses.
+  window.renderPageContent = function (lang) {
+    document.getElementById("poet-tagline").textContent = poet[fieldForLang("tagline", lang)];
+    document.getElementById("poet-bio").textContent = poet[fieldForLang("bio", lang)];
+    document.getElementById("bazm-teaser").textContent = bazm[fieldForLang("intro", lang)];
+    document.getElementById("city-intro-text").textContent = city[fieldForLang("intro", lang)];
+
+    document.getElementById("poem-teaser").innerHTML = poems.slice(0, 2).map(p => `
+      <article class="poem-card">
+        <div class="poem-card-head">
+          <span class="pill">${p.book}</span>
+          <span class="muted" style="font-size:13px;">${p.title}</span>
+        </div>
+        <p class="poem-text">${p.textUrdu.replace(/\n/g, "<br>")}</p>
+      </article>`).join("");
+  };
+  window.renderPageContent(LangStore.get());
 </script>
 </body>
 </html>

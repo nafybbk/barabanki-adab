@@ -33,6 +33,8 @@ const UI_STRINGS = {
     shagirdBody: "Share your writings, reels, and photos — under your own name, become part of this literary family.",
     cityEyebrow: "The City of Barabanki", citySoilHeading: "The soil that raised a poet",
     cityTareekh: "History", cityDargah: "Dargah", cityKhidmaat: "Services", cityGuideCard: "Guide",
+    offlineSaved: "This book is saved for offline reading", offlineRemove: "Remove",
+    offlineWillSave: "This book will be saved for offline reading once it loads.",
   },
   hi: {
     home: "मुख्य पृष्ठ", books: "किताबें", poetry: "शायरी संग्रह", shagird: "शागिर्द मंडली",
@@ -58,6 +60,8 @@ const UI_STRINGS = {
     shagirdBody: "अपनी तहरीरें, रील्स, और तस्वीरें साझा करें — अपने नाम के साथ, इस अदबी ख़ानदान का हिस्सा बनें।",
     cityEyebrow: "शहर-ए-बाराबंकी", citySoilHeading: "वह मिट्टी जिसने शायर पैदा किए",
     cityTareekh: "तारीख़", cityDargah: "दरगाह", cityKhidmaat: "ख़िदमात", cityGuideCard: "गाइड",
+    offlineSaved: "यह किताब ऑफ़लाइन पढ़ने के लिए सेव हो गई है", offlineRemove: "हटाएँ",
+    offlineWillSave: "लोड होते ही यह किताब ऑफ़लाइन पढ़ने के लिए सेव हो जाएगी।",
   },
   ur: {
     home: "صفحہ اول", books: "کتابیں", poetry: "شاعری آرکائیو", shagird: "شاگرد حلقہ",
@@ -83,6 +87,8 @@ const UI_STRINGS = {
     shagirdBody: "اپنی تحریریں، ریلز، اور تصویریں شیئر کریں — اپنے نام کے ساتھ، اس ادبی خاندان کا حصہ بنیں۔",
     cityEyebrow: "شہرِ بارہ بنکی", citySoilHeading: "وہ مٹی جس نے شاعر پیدا کیے",
     cityTareekh: "تاریخ", cityDargah: "درگاہ", cityKhidmaat: "خدمات", cityGuideCard: "گائیڈ",
+    offlineSaved: "یہ کتاب آف لائن پڑھنے کے لیے محفوظ ہو گئی ہے", offlineRemove: "ہٹائیں",
+    offlineWillSave: "لوڈ ہوتے ہی یہ کتاب آف لائن پڑھنے کے لیے محفوظ ہو جائے گی۔",
   },
 };
 

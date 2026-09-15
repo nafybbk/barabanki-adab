@@ -40,6 +40,7 @@ function siteHeader(active) {
       </a>
       <nav class="nav-links" id="navLinks">${linksHTML}</nav>
       <div id="lang-toggle" class="lang-toggle-desktop"></div>
+      <div id="adab-auth-widget"></div>
       <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -110,6 +111,15 @@ function mountSiteChrome(active) {
   // Mirror the desktop lang toggle into the header container id expected by i18n.js
   const desktopLang = document.querySelector(".lang-toggle-desktop");
   if (desktopLang) desktopLang.id = "lang-toggle";
+
+  if (typeof mountAuthWidget === "function") mountAuthWidget("adab-auth-widget");
+
+  // Close any open auth dropdown when clicking outside it.
+  document.addEventListener("click", (e) => {
+    const wrap = document.querySelector(".auth-widget-wrap");
+    const panel = document.getElementById("aw-panel");
+    if (wrap && panel && !panel.hidden && !wrap.contains(e.target)) panel.hidden = true;
+  });
 }
 
 // PWA: service worker register karo (HTTPS ya localhost par hi chalega).

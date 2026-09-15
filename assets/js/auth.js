@@ -7,6 +7,26 @@
 // bazm_* PIN scheme's weaker trust model).
 // ============================================================
 
+function escapeHtmlAD(str) {
+  return String(str || "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function bazmDirErrorText(code, t) {
+  return t[`bazmErr_${code}`] || t.bazmErr_default;
+}
+
+function bazmGetIdentity() {
+  if (AdabAuth.isLoggedIn()) {
+    const u = AdabAuth.currentUser();
+    return { mode: "google", userId: u.id, email: u.email };
+  }
+  const pinSession = AdabPinAuth.getSession();
+  if (pinSession) {
+    return { mode: "pin", userId: pinSession.user_id, email: pinSession.email, name: pinSession.name };
+  }
+  return null;
+}
+
 const ADAB_SUPABASE_URL = "https://qdghsvkdvazrihurayoy.supabase.co";
 const ADAB_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZ2hzdmtkdmF6cmlodXJheW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0MzAyNjMsImV4cCI6MjEwNDAwNjI2M30.4I9-x4vh-OWMegooC0A1UQbZ4r84_d0ljCrfA8lW8do";
 const ADAB_GOOGLE_CLIENT_ID = "669308173642-0nes8rlr123stbts1gnbhsk9lac8gmja.apps.googleusercontent.com";

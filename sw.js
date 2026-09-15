@@ -15,7 +15,7 @@
 // karna — warna purana shell cache hi serve hota rahega.
 // ============================================================
 
-const SHELL_CACHE = "adab-shell-v16";
+const SHELL_CACHE = "adab-shell-v17";
 const BOOK_CACHE = "adab-books-v1";
 const FONT_HOSTS = ["fonts.googleapis.com", "fonts.gstatic.com"];
 

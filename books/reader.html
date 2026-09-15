@@ -64,7 +64,7 @@
   // books, 1 (default) for any future LTR one.
   document.getElementById("df-book-mount").innerHTML = `
     <div class="_df_book"
-         source="../${book.pdf}"
+         source="../${book.pdfWeb || book.pdf}"
          direction="${book.rtl ? 2 : 1}"
          height="640"
          webgl="true"

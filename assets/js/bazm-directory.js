@@ -65,6 +65,15 @@ async function mountBazmDirectory(containerId) {
           await AdabAuth.rpc("adab_upsert_profile", { p_name: name, p_phone: phone, p_device_id: AdabAuth.getDeviceId() });
           render();
         } catch (e) {
+          const knownCodes = ["NAAM_KHALI", "BOHOT_ACCOUNTS", "NOT_LOGGED_IN"];
+          if (!knownCodes.includes(e.message)) {
+            // Session points at an identity the server no longer recognizes
+            // (e.g. stale/orphaned login) — clear it and fall back to the
+            // login screen instead of getting stuck on a silent failure.
+            AdabAuth.logout();
+            render();
+            return;
+          }
           errEl.innerHTML = `<div class="bazm-error">${bazmDirErrorText(e.message, t)}</div>`;
         }
       };

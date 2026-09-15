@@ -654,3 +654,66 @@ footer a:hover { color: var(--gold); }
 .upload-row .upload-state.err { color: #e08080; }
 .upload-bar { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.15); overflow: hidden; width: 90px; }
 .upload-bar span { display: block; height: 100%; width: 0; background: var(--gold); transition: width 0.2s; }
+
+/* ============================================================
+   Bazm widget — mobile-first by default (this audience is
+   phone-only), desktop just gets a max-width cap via .section's
+   own container. Inputs/buttons sized for a thumb, not a cursor.
+   ============================================================ */
+.bazm-widget {
+  background: var(--paper-deep); border: 1px solid var(--paper-line); border-radius: 12px;
+  padding: 18px 16px; max-width: 640px; margin: 0 auto;
+}
+.bazm-widget-title {
+  font-family: var(--font-display); font-size: 20px; color: var(--maroon-deep);
+  margin-bottom: 14px; text-align: center; font-weight: 600;
+}
+.bazm-widget.lang-urdu .bazm-widget-title,
+.bazm-widget.lang-urdu .bazm-post-content,
+.bazm-widget.lang-urdu .bazm-textarea,
+.bazm-widget.lang-urdu .bazm-input,
+.bazm-widget.lang-urdu .bazm-as,
+.bazm-widget.lang-urdu .bazm-empty,
+.bazm-widget.lang-urdu .bazm-error { font-family: var(--font-nastaliq); }
+
+.bazm-auth-form { display: flex; flex-direction: column; gap: 10px; }
+.bazm-input, .bazm-textarea {
+  width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 8px;
+  border: 1px solid var(--paper-line); background: var(--paper); color: var(--ink);
+  font-size: 16px; font-family: var(--font-ui);
+}
+.bazm-textarea { min-height: 88px; resize: vertical; line-height: 1.6; }
+.bazm-auth-actions { display: flex; flex-direction: column; gap: 8px; }
+.bazm-btn { width: 100%; padding: 13px 16px; font-size: 15px; border-radius: 8px; min-height: 46px; }
+@media (min-width: 520px) {
+  .bazm-auth-actions { flex-direction: row; }
+  .bazm-btn { width: auto; flex: 1; }
+}
+
+.bazm-as {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  font-family: var(--font-ui); font-size: 14px; color: var(--ink-soft); margin-bottom: 10px;
+}
+.bazm-logout-link {
+  background: none; border: none; color: var(--maroon); text-decoration: underline;
+  font-family: var(--font-ui); font-size: 13px; cursor: pointer; padding: 4px;
+}
+.bazm-send-btn { margin-top: 10px; }
+
+.bazm-error {
+  display: none; background: rgba(180, 40, 40, 0.1); color: #7a1f1f; border-radius: 8px;
+  padding: 10px 12px; font-size: 14px; font-family: var(--font-ui); margin-top: 10px;
+}
+
+.bazm-post-list { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }
+.bazm-loading, .bazm-empty { text-align: center; padding: 20px 0; font-family: var(--font-ui); }
+.bazm-post {
+  background: var(--paper); border-radius: 10px; padding: 12px 14px; border: 1px solid var(--paper-line);
+}
+.bazm-post-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+  margin-bottom: 6px; font-family: var(--font-ui);
+}
+.bazm-post-name { font-weight: 600; color: var(--maroon-deep); font-size: 14px; }
+.bazm-post-time { font-size: 12px; color: var(--ink-soft); opacity: 0.75; white-space: nowrap; }
+.bazm-post-content { font-size: 16px; line-height: 1.8; color: var(--ink); }

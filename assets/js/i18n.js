@@ -15,6 +15,11 @@ const UI_STRINGS = {
     readBooks: "Read Books", searchPoetry: "Search Poetry",
     aboutTitle: "About", joinBazm: "Join Bazm-e-Aziz",
     footerTagline: "Preserving verse, discipleship, and the spirit of Barabanki.",
+    bzTitle: "Bazm", bzYourName: "Your name", bzYourPin: "PIN (4-6 digits)",
+    bzLogin: "Log in", bzRegister: "New here? Register", bzHaveAccount: "Already registered? Log in",
+    bzLogout: "Log out", bzPlaceholder: "Write a comment, a sher, or a whole ghazal...",
+    bzSend: "Post", bzEmpty: "No one has written here yet — be the first.",
+    bzLoading: "Loading...", bzAs: "Posting as",
   },
   hi: {
     home: "मुख्य पृष्ठ", books: "किताबें", poetry: "शायरी संग्रह", shagird: "शागिर्द मंडली",
@@ -22,6 +27,11 @@ const UI_STRINGS = {
     readBooks: "किताबें पढ़ें", searchPoetry: "शायरी खोजें",
     aboutTitle: "परिचय", joinBazm: "बज़्म-ए-अज़ीज़ में शामिल हों",
     footerTagline: "शायरी, शागिर्दी और बाराबंकी की रूह को महफ़ूज़ रखने की एक कोशिश।",
+    bzTitle: "बज़्म", bzYourName: "अपना नाम", bzYourPin: "पिन (4-6 अंक)",
+    bzLogin: "दाख़िल हों", bzRegister: "नए हैं? रजिस्टर करें", bzHaveAccount: "पहले से रजिस्टर्ड? दाख़िल हों",
+    bzLogout: "बाहर निकलें", bzPlaceholder: "कोई तब्सेरा, शेर, या पूरी ग़ज़ल लिखें...",
+    bzSend: "भेजें", bzEmpty: "अभी तक किसी ने कुछ नहीं लिखा — सबसे पहले आप लिखें।",
+    bzLoading: "लोड हो रहा है...", bzAs: "के नाम से पोस्ट हो रहा है",
   },
   ur: {
     home: "صفحہ اول", books: "کتابیں", poetry: "شاعری آرکائیو", shagird: "شاگرد حلقہ",
@@ -29,6 +39,11 @@ const UI_STRINGS = {
     readBooks: "کتابیں پڑھیں", searchPoetry: "شاعری تلاش کریں",
     aboutTitle: "تعارف", joinBazm: "بزم عزیز میں شامل ہوں",
     footerTagline: "شاعری، شاگردی اور بارہ بنکی کی روح کو محفوظ رکھنے کی ایک کوشش۔",
+    bzTitle: "بزم", bzYourName: "اپنا نام", bzYourPin: "پن (٤ سے ٦ ہندسے)",
+    bzLogin: "داخل ہوں", bzRegister: "نئے ہیں؟ رجسٹر کریں", bzHaveAccount: "پہلے سے رجسٹرڈ؟ داخل ہوں",
+    bzLogout: "باہر نکلیں", bzPlaceholder: "کوئی تبصرہ، شعر، یا پوری غزل لکھیں۔۔۔",
+    bzSend: "بھیجیں", bzEmpty: "ابھی تک کسی نے کچھ نہیں لکھا — سب سے پہلے آپ لکھیں۔",
+    bzLoading: "لوڈ ہو رہا ہے۔۔۔", bzAs: "کے نام سے پوسٹ ہو رہا ہے",
   },
 };
 

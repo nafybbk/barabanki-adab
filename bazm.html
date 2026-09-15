@@ -38,11 +38,17 @@
   <a href="shagird/index.html" class="btn btn-primary">Shagird circle mein shamil hon</a>
 </section>
 
+<section class="section section-tight">
+  <div id="bazm-comments-widget"></div>
+</section>
+
 <div id="site-footer"></div>
 
 <script src="assets/js/data.js?v=9"></script>
 <script src="assets/js/chrome.js?v=9"></script>
 <script src="assets/js/i18n.js?v=9"></script>
+<script src="assets/js/bazm-comments.js?v=1"></script>
+<script src="assets/js/bazm-widget.js?v=1"></script>
 <script>
   const { bazm } = SITE_DATA;
   document.getElementById("bazm-name-ur").textContent = bazm.nameUrdu;
@@ -50,6 +56,8 @@
   document.getElementById("bazm-founded").textContent = `Qayam: ${bazm.founded}`;
   document.getElementById("bazm-intro-ur").textContent = bazm.introUrdu;
   document.getElementById("bazm-intro-en").textContent = bazm.intro;
+
+  mountBazmWidget("bazm-comments-widget", "bazm-e-aziz");
 </script>
 </body>
 </html>

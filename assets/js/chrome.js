@@ -83,7 +83,7 @@ function siteFooter() {
       </div>
       <div class="footer-bottom">
         <span>© <span id="year"></span> ${poet.name} — Bazm-e-Aziz, Barabanki</span>
-        <span>Mohabbat se banaya gaya · <a href="${resolveHref("/admin/index.html")}" style="opacity:0.5;">Admin</a></span>
+        <span>Nafees Ahmad · <a href="https://bizcorindia.com" target="_blank" rel="noopener" style="opacity:0.85;">BizCorIndia.com</a> · <a href="${resolveHref("/admin/index.html")}" style="opacity:0.5;">Admin</a></span>
       </div>
     </div>
   </footer>`;

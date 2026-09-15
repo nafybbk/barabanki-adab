@@ -51,6 +51,8 @@ const UI_STRINGS = {
     bazmPostPlaceholder: "Write a comment, a sher, or a whole ghazal...", bazmPostBtn: "Post",
     bazmPostEmpty: "No one has written here yet — be the first.", bazmViewPosts: "View & post",
     bazmErr_MEMBER_NAHI: "Join this Bazm first to post",
+    bazmCompleteProfileBanner: "Complete your profile so other members know who you are.",
+    bazmCompleteProfileBtn: "Complete profile", bazmSignedInAs: "Signed in as",
   },
   hi: {
     home: "मुख्य पृष्ठ", books: "किताबें", poetry: "शायरी संग्रह", shagird: "शागिर्द मंडली",
@@ -94,6 +96,8 @@ const UI_STRINGS = {
     bazmPostPlaceholder: "कोई तब्सेरा, शेर, या पूरी ग़ज़ल लिखें...", bazmPostBtn: "भेजें",
     bazmPostEmpty: "अभी तक किसी ने कुछ नहीं लिखा — सबसे पहले आप लिखें।", bazmViewPosts: "देखें और लिखें",
     bazmErr_MEMBER_NAHI: "पोस्ट करने के लिए पहले इस बज़्म में शामिल हों",
+    bazmCompleteProfileBanner: "अपनी प्रोफ़ाइल पूरी करें ताकि बाकी सदस्य आपको पहचान सकें।",
+    bazmCompleteProfileBtn: "प्रोफ़ाइल पूरी करें", bazmSignedInAs: "लॉगिन है",
   },
   ur: {
     home: "صفحہ اول", books: "کتابیں", poetry: "شاعری آرکائیو", shagird: "شاگرد حلقہ",
@@ -137,6 +141,8 @@ const UI_STRINGS = {
     bazmPostPlaceholder: "کوئی تبصرہ، شعر، یا پوری غزل لکھیں۔۔۔", bazmPostBtn: "بھیجیں",
     bazmPostEmpty: "ابھی تک کسی نے کچھ نہیں لکھا — سب سے پہلے آپ لکھیں۔", bazmViewPosts: "دیکھیں اور لکھیں",
     bazmErr_MEMBER_NAHI: "پوسٹ کرنے کے لیے پہلے اس بزم میں شامل ہوں",
+    bazmCompleteProfileBanner: "اپنی پروفائل مکمل کریں تاکہ باقی ارکان آپ کو پہچان سکیں۔",
+    bazmCompleteProfileBtn: "پروفائل مکمل کریں", bazmSignedInAs: "لاگ ان ہے",
   },
 };
 

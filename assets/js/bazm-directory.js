@@ -43,19 +43,18 @@ async function mountBazmDirectory(containerId) {
       profile = rows[0] || null;
     } catch {}
 
-    if (!profile) {
+    function profileFormHtml() {
       const googleName = (AdabAuth.currentUser().user_metadata && (AdabAuth.currentUser().user_metadata.full_name || AdabAuth.currentUser().user_metadata.name)) || "";
-      el.innerHTML = `
-        <div class="bazm-widget ${LangStore.get() === "ur" ? "lang-urdu" : ""}">
-          <div class="bazm-widget-title">${t.bazmProfileHeading}</div>
-          <p class="muted" style="margin-bottom:14px;">${t.bazmProfileNote}</p>
-          <div class="bazm-auth-form">
-            <input class="bazm-input" id="bd-profile-name" placeholder="${t.bazmNamePh}" value="${escapeHtmlAD(googleName)}">
-            <input class="bazm-input" id="bd-profile-phone" placeholder="${t.bazmPhonePh}" type="tel">
-            <button class="btn btn-primary bazm-btn" id="bd-profile-save">${t.bazmSaveBtn}</button>
-          </div>
-          <div id="bd-profile-error"></div>
-        </div>`;
+      return `
+        <div class="bazm-auth-form" style="margin-top:12px;">
+          <input class="bazm-input" id="bd-profile-name" placeholder="${t.bazmNamePh}" value="${escapeHtmlAD((profile && profile.name) || googleName)}">
+          <input class="bazm-input" id="bd-profile-phone" placeholder="${t.bazmPhonePh}" type="tel" value="${escapeHtmlAD((profile && profile.phone) || "")}">
+          <button class="btn btn-primary bazm-btn" id="bd-profile-save">${t.bazmSaveBtn}</button>
+        </div>
+        <div id="bd-profile-error"></div>`;
+    }
+
+    function wireProfileForm(onSaved) {
       document.getElementById("bd-profile-save").onclick = async () => {
         const name = document.getElementById("bd-profile-name").value.trim();
         const phone = document.getElementById("bd-profile-phone").value.trim();
@@ -63,7 +62,7 @@ async function mountBazmDirectory(containerId) {
         errEl.innerHTML = "";
         try {
           await AdabAuth.rpc("adab_upsert_profile", { p_name: name, p_phone: phone, p_device_id: AdabAuth.getDeviceId() });
-          render();
+          onSaved();
         } catch (e) {
           const knownCodes = ["NAAM_KHALI", "BOHOT_ACCOUNTS", "NOT_LOGGED_IN"];
           if (!knownCodes.includes(e.message)) {
@@ -77,10 +76,39 @@ async function mountBazmDirectory(containerId) {
           errEl.innerHTML = `<div class="bazm-error">${bazmDirErrorText(e.message, t)}</div>`;
         }
       };
+    }
+
+    const userEmail = (AdabAuth.currentUser() && AdabAuth.currentUser().email) || "";
+
+    // No profile yet: don't hard-block the whole page on it (a user may
+    // want to just look around first) — show it as its own expanded card,
+    // separate from the always-visible directory below.
+    if (!profile) {
+      el.innerHTML = `
+        <div class="bazm-widget ${LangStore.get() === "ur" ? "lang-urdu" : ""}">
+          <div class="bazm-widget-title">${t.bazmDirTitle}</div>
+          <div class="bazm-as">${t.bazmSignedInAs} <strong>${escapeHtmlAD(userEmail)}</strong> · <a href="#" class="bazm-logout-link" id="bd-logout-top">${t.bazmLogoutBtn}</a></div>
+        </div>
+        <div class="bazm-widget ${LangStore.get() === "ur" ? "lang-urdu" : ""}" style="margin-top:14px;">
+          <div class="bazm-widget-title" style="font-size:16px;">${t.bazmProfileHeading}</div>
+          <p class="muted">${t.bazmProfileNote}</p>
+          ${profileFormHtml()}
+        </div>
+        <div id="bd-rest"></div>`;
+      document.getElementById("bd-logout-top").onclick = (e) => { e.preventDefault(); AdabAuth.logout(); render(); };
+      wireProfileForm(() => render());
+      // Directory still loads and is usable underneath (browse-only until
+      // a join/post action prompts profile completion).
+      await renderDirectoryInto(document.getElementById("bd-rest"), null);
       return;
     }
 
-    // Logged in + profile complete: full directory.
+    await renderDirectoryInto(el, profile, userEmail);
+  }
+
+  async function renderDirectoryInto(el, profile, userEmail) {
+    const t = UI_STRINGS[LangStore.get()] || UI_STRINGS.en;
+    // Logged in: full directory (profile may still be null — browse-only).
     let approved = [];
     let mine = [];
     let myMemberships = [];
@@ -136,11 +164,15 @@ async function mountBazmDirectory(containerId) {
          </div>`
       : "";
 
+    const headerHtml = profile
+      ? `<div class="bazm-widget-title">${t.bazmDirTitle}</div>
+         <p class="muted">${t.bazmDirIntro}</p>
+         <div class="bazm-as">${t.bazmLoggedInAs} ${escapeHtmlAD(profile.name)} · <a href="#" class="bazm-logout-link" id="bd-logout">${t.bazmLogoutBtn}</a></div>`
+      : `<p class="muted" style="margin-bottom:10px;">${t.bazmCompleteProfileBanner}</p>`;
+
     el.innerHTML = `
       <div class="bazm-widget ${LangStore.get() === "ur" ? "lang-urdu" : ""}">
-        <div class="bazm-widget-title">${t.bazmDirTitle}</div>
-        <p class="muted">${t.bazmDirIntro}</p>
-        <div class="bazm-as">${t.bazmLoggedInAs} ${escapeHtmlAD(profile.name)} · <a href="#" class="bazm-logout-link" id="bd-logout">${t.bazmLogoutBtn}</a></div>
+        ${headerHtml}
         <div class="bazm-dir-list">${listHtml}</div>
         ${pendingHtml}
         <button class="btn btn-ghost" id="bd-create-toggle" style="margin-top:20px;">${t.bazmCreateToggle}</button>
@@ -154,7 +186,8 @@ async function mountBazmDirectory(containerId) {
         </div>
       </div>`;
 
-    document.getElementById("bd-logout").onclick = (e) => { e.preventDefault(); AdabAuth.logout(); render(); };
+    const logoutLink = document.getElementById("bd-logout");
+    if (logoutLink) logoutLink.onclick = (e) => { e.preventDefault(); AdabAuth.logout(); render(); };
 
     el.querySelectorAll(".bazm-join-btn").forEach((btn) => {
       btn.onclick = async () => {

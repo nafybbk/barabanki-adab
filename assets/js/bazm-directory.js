@@ -1,7 +1,10 @@
 // ============================================================
-// BAZM DIRECTORY — login gate (Google), one-time profile (naam+
-// phone), list of approved Bazms with join/leave, "start a new
-// Bazm" form (goes in pending until approved via WhatsApp).
+// BAZM DIRECTORY — Google Sign-In (proves you're a real person once)
+// or, if you've set one up, a quick email+PIN sign-in for using your
+// account on a device that isn't your own. Either way: one-time
+// profile (naam+phone, fillable whenever), list of approved Bazms
+// with join/leave/post, "start a new Bazm" (pending until approved
+// via WhatsApp).
 // ============================================================
 
 const ADAB_WHATSAPP_NUMBER = "917905282816"; // country code 91 + number
@@ -14,44 +17,93 @@ function bazmDirErrorText(code, t) {
   return t[`bazmErr_${code}`] || t.bazmErr_default;
 }
 
+function bazmGetIdentity() {
+  if (AdabAuth.isLoggedIn()) {
+    const u = AdabAuth.currentUser();
+    return { mode: "google", userId: u.id, email: u.email };
+  }
+  const pinSession = AdabPinAuth.getSession();
+  if (pinSession) {
+    return { mode: "pin", userId: pinSession.user_id, email: pinSession.email, name: pinSession.name };
+  }
+  return null;
+}
+
 async function mountBazmDirectory(containerId) {
   const el = document.getElementById(containerId);
   if (!el) return;
 
   async function render() {
     const t = UI_STRINGS[LangStore.get()] || UI_STRINGS.en;
+    const identity = bazmGetIdentity();
+    const isUrdu = LangStore.get() === "ur";
 
-    if (!AdabAuth.isLoggedIn()) {
+    if (!identity) {
       el.innerHTML = `
-        <div class="bazm-widget ${LangStore.get() === "ur" ? "lang-urdu" : ""}">
+        <div class="bazm-widget ${isUrdu ? "lang-urdu" : ""}">
           <div class="bazm-widget-title">${t.bazmDirTitle}</div>
           <p class="muted" style="margin-bottom:16px;">${t.bazmLoginPrompt}</p>
           <div id="bazm-google-btn"></div>
+          <p class="muted" style="margin:14px 0 8px; font-size:13px;">
+            <a href="#" id="bd-pin-toggle">${t.bazmOrPinLogin}</a>
+          </p>
+          <div class="bazm-auth-form" id="bd-pin-form" hidden>
+            <input class="bazm-input" id="bd-pin-email" placeholder="${t.bazmEmailPh}" type="email">
+            <input class="bazm-input" id="bd-pin-pin" placeholder="${t.bazmPinPh}" type="tel" maxlength="6">
+            <button class="btn btn-ghost bazm-btn" id="bd-pin-login-btn">${t.bazmPinLoginBtn}</button>
+          </div>
+          <div id="bd-pin-error"></div>
         </div>`;
       initGoogleSignIn(
         "bazm-google-btn",
         () => render(),
         () => { el.querySelector(".bazm-widget").insertAdjacentHTML("beforeend", `<div class="bazm-error">${t.bazmErr_default}</div>`); }
       );
+      document.getElementById("bd-pin-toggle").onclick = (e) => {
+        e.preventDefault();
+        document.getElementById("bd-pin-form").hidden = false;
+      };
+      document.getElementById("bd-pin-login-btn").onclick = async () => {
+        const email = document.getElementById("bd-pin-email").value.trim();
+        const pin = document.getElementById("bd-pin-pin").value.trim();
+        const errEl = document.getElementById("bd-pin-error");
+        errEl.innerHTML = "";
+        try {
+          await AdabPinAuth.login(email, pin);
+          render();
+        } catch (e) {
+          errEl.innerHTML = `<div class="bazm-error">${bazmDirErrorText(e.message, t)}</div>`;
+        }
+      };
       return;
     }
 
-    let profile = null;
-    try {
-      const uid = AdabAuth.currentUser().id;
-      const rows = await AdabAuth.authRead(`adab_user_profiles?user_id=eq.${uid}&select=name,phone`);
-      profile = rows[0] || null;
-    } catch {}
+    let profile = identity.mode === "pin" ? { name: identity.name } : null;
+    if (identity.mode === "google") {
+      try {
+        const rows = await AdabAuth.authRead(`adab_user_profiles?user_id=eq.${identity.userId}&select=name,phone,pin_hash`);
+        profile = rows[0] || null;
+      } catch {}
+    }
 
     function profileFormHtml() {
-      const googleName = (AdabAuth.currentUser().user_metadata && (AdabAuth.currentUser().user_metadata.full_name || AdabAuth.currentUser().user_metadata.name)) || "";
+      const googleName = (AdabAuth.currentUser() && AdabAuth.currentUser().user_metadata && (AdabAuth.currentUser().user_metadata.full_name || AdabAuth.currentUser().user_metadata.name)) || "";
       return `
         <div class="bazm-auth-form" style="margin-top:12px;">
           <input class="bazm-input" id="bd-profile-name" placeholder="${t.bazmNamePh}" value="${escapeHtmlAD((profile && profile.name) || googleName)}">
           <input class="bazm-input" id="bd-profile-phone" placeholder="${t.bazmPhonePh}" type="tel" value="${escapeHtmlAD((profile && profile.phone) || "")}">
           <button class="btn btn-primary bazm-btn" id="bd-profile-save">${t.bazmSaveBtn}</button>
         </div>
-        <div id="bd-profile-error"></div>`;
+        <div id="bd-profile-error"></div>
+        <div style="margin-top:22px; padding-top:18px; border-top:1px dashed var(--paper-line);">
+          <div class="bazm-widget-title" style="font-size:15px;">${t.bazmSetPinHeading}</div>
+          <p class="muted" style="font-size:13px;">${t.bazmSetPinNote}</p>
+          <div class="bazm-auth-form">
+            <input class="bazm-input" id="bd-set-pin" placeholder="${t.bazmPinPh}" type="tel" maxlength="6">
+            <button class="btn btn-ghost bazm-btn" id="bd-set-pin-btn">${t.bazmSetPinBtn}</button>
+          </div>
+          <div id="bd-set-pin-error"></div>
+        </div>`;
     }
 
     function wireProfileForm(onSaved) {
@@ -76,20 +128,28 @@ async function mountBazmDirectory(containerId) {
           errEl.innerHTML = `<div class="bazm-error">${bazmDirErrorText(e.message, t)}</div>`;
         }
       };
+      document.getElementById("bd-set-pin-btn").onclick = async () => {
+        const pin = document.getElementById("bd-set-pin").value.trim();
+        const errEl = document.getElementById("bd-set-pin-error");
+        errEl.innerHTML = "";
+        try {
+          await AdabAuth.rpc("adab_set_pin", { p_pin: pin });
+          errEl.innerHTML = `<div class="muted" style="font-size:13px;">✓ ${t.bazmSetPinBtn}</div>`;
+        } catch (e) {
+          errEl.innerHTML = `<div class="bazm-error">${bazmDirErrorText(e.message, t)}</div>`;
+        }
+      };
     }
 
-    const userEmail = (AdabAuth.currentUser() && AdabAuth.currentUser().email) || "";
-
-    // No profile yet: don't hard-block the whole page on it (a user may
-    // want to just look around first) — show it as its own expanded card,
-    // separate from the always-visible directory below.
+    // No profile yet (Google mode only — PIN mode always has one already):
+    // don't hard-block the whole page on it, show it as its own card.
     if (!profile) {
       el.innerHTML = `
-        <div class="bazm-widget ${LangStore.get() === "ur" ? "lang-urdu" : ""}">
+        <div class="bazm-widget ${isUrdu ? "lang-urdu" : ""}">
           <div class="bazm-widget-title">${t.bazmDirTitle}</div>
-          <div class="bazm-as">${t.bazmSignedInAs} <strong>${escapeHtmlAD(userEmail)}</strong> · <a href="#" class="bazm-logout-link" id="bd-logout-top">${t.bazmLogoutBtn}</a></div>
+          <div class="bazm-as">${t.bazmSignedInAs} <strong>${escapeHtmlAD(identity.email)}</strong> · <a href="#" class="bazm-logout-link" id="bd-logout-top">${t.bazmLogoutBtn}</a></div>
         </div>
-        <div class="bazm-widget ${LangStore.get() === "ur" ? "lang-urdu" : ""}" style="margin-top:14px;">
+        <div class="bazm-widget ${isUrdu ? "lang-urdu" : ""}" style="margin-top:14px;">
           <div class="bazm-widget-title" style="font-size:16px;">${t.bazmProfileHeading}</div>
           <p class="muted">${t.bazmProfileNote}</p>
           ${profileFormHtml()}
@@ -97,27 +157,32 @@ async function mountBazmDirectory(containerId) {
         <div id="bd-rest"></div>`;
       document.getElementById("bd-logout-top").onclick = (e) => { e.preventDefault(); AdabAuth.logout(); render(); };
       wireProfileForm(() => render());
-      // Directory still loads and is usable underneath (browse-only until
-      // a join/post action prompts profile completion).
-      await renderDirectoryInto(document.getElementById("bd-rest"), null);
+      await renderDirectoryInto(document.getElementById("bd-rest"), null, identity);
       return;
     }
 
-    await renderDirectoryInto(el, profile, userEmail);
+    await renderDirectoryInto(el, profile, identity, profileFormHtml, wireProfileForm);
   }
 
-  async function renderDirectoryInto(el, profile, userEmail) {
+  async function renderDirectoryInto(el, profile, identity, profileFormHtml, wireProfileForm) {
     const t = UI_STRINGS[LangStore.get()] || UI_STRINGS.en;
-    // Logged in: full directory (profile may still be null — browse-only).
+    const isUrdu = LangStore.get() === "ur";
+
+    async function writeRpc(base, params) {
+      if (identity.mode === "google") return AdabAuth.rpc(base, params);
+      return AdabPinAuth.rpc(`${base}_pin`, params);
+    }
+
     let approved = [];
     let mine = [];
     let myMemberships = [];
     try {
       approved = await AdabAuth.publicRead("bazms?approved=eq.true&select=id,name,name_urdu,name_hindi,description");
-      const uid = AdabAuth.currentUser().id;
-      mine = await AdabAuth.authRead(`bazms?created_by=eq.${uid}&approved=eq.false&select=id,name,created_at`);
+      if (identity.mode === "google") {
+        mine = await AdabAuth.authRead(`bazms?created_by=eq.${identity.userId}&approved=eq.false&select=id,name,created_at`);
+      }
       const memberRows = await AdabAuth.publicRead(`bazm_memberships?select=bazm_id`);
-      myMemberships = await AdabAuth.authRead(`bazm_memberships?user_id=eq.${uid}&select=bazm_id`);
+      myMemberships = await AdabAuth.publicRead(`bazm_memberships?user_id=eq.${identity.userId}&select=bazm_id`);
       var memberCounts = {};
       memberRows.forEach((r) => { memberCounts[r.bazm_id] = (memberCounts[r.bazm_id] || 0) + 1; });
     } catch {
@@ -126,7 +191,7 @@ async function mountBazmDirectory(containerId) {
     const myBazmIds = new Set(myMemberships.map((m) => m.bazm_id));
 
     const listHtml = approved.map((b) => {
-      const nameField = LangStore.get() === "ur" ? (b.name_urdu || b.name) : LangStore.get() === "hi" ? (b.name_hindi || b.name) : b.name;
+      const nameField = isUrdu ? (b.name_urdu || b.name) : LangStore.get() === "hi" ? (b.name_hindi || b.name) : b.name;
       const joined = myBazmIds.has(b.id);
       const count = memberCounts[b.id] || 0;
       return `
@@ -164,14 +229,19 @@ async function mountBazmDirectory(containerId) {
          </div>`
       : "";
 
+    const pinNote = identity.mode === "pin" ? ` ${t.bazmPinModeNote}` : "";
     const headerHtml = profile
       ? `<div class="bazm-widget-title">${t.bazmDirTitle}</div>
          <p class="muted">${t.bazmDirIntro}</p>
-         <div class="bazm-as">${t.bazmLoggedInAs} ${escapeHtmlAD(profile.name)} · <a href="#" class="bazm-logout-link" id="bd-logout">${t.bazmLogoutBtn}</a></div>`
+         <div class="bazm-as">${t.bazmLoggedInAs} ${escapeHtmlAD(profile.name)}${pinNote} · <a href="#" class="bazm-logout-link" id="bd-logout">${t.bazmLogoutBtn}</a></div>`
       : `<p class="muted" style="margin-bottom:10px;">${t.bazmCompleteProfileBanner}</p>`;
 
+    const profileSectionHtml = (identity.mode === "google" && profileFormHtml)
+      ? `<div style="margin-top:22px; padding-top:18px; border-top:1px dashed var(--paper-line);">${profileFormHtml()}</div>`
+      : "";
+
     el.innerHTML = `
-      <div class="bazm-widget ${LangStore.get() === "ur" ? "lang-urdu" : ""}">
+      <div class="bazm-widget ${isUrdu ? "lang-urdu" : ""}">
         ${headerHtml}
         <div class="bazm-dir-list">${listHtml}</div>
         ${pendingHtml}
@@ -184,17 +254,25 @@ async function mountBazmDirectory(containerId) {
           </div>
           <div id="bd-create-error"></div>
         </div>
+        ${profileSectionHtml}
       </div>`;
 
     const logoutLink = document.getElementById("bd-logout");
-    if (logoutLink) logoutLink.onclick = (e) => { e.preventDefault(); AdabAuth.logout(); render(); };
+    if (logoutLink) {
+      logoutLink.onclick = (e) => {
+        e.preventDefault();
+        if (identity.mode === "google") AdabAuth.logout(); else AdabPinAuth.logout();
+        render();
+      };
+    }
+    if (identity.mode === "google" && wireProfileForm) wireProfileForm(() => render());
 
     el.querySelectorAll(".bazm-join-btn").forEach((btn) => {
       btn.onclick = async () => {
         const id = btn.getAttribute("data-id");
         const joined = btn.getAttribute("data-joined") === "true";
         try {
-          await AdabAuth.rpc(joined ? "adab_leave_bazm" : "adab_join_bazm", { p_bazm_id: id });
+          await writeRpc(joined ? "adab_leave_bazm" : "adab_join_bazm", { p_bazm_id: id });
           render();
         } catch (e) {
           alert(bazmDirErrorText(e.message, t));
@@ -237,7 +315,7 @@ async function mountBazmDirectory(containerId) {
           errEl.innerHTML = "";
           sendBtn.disabled = true;
           try {
-            await AdabAuth.rpc("adab_add_bazm_post", { p_bazm_id: bazmId, p_content: textarea.value });
+            await writeRpc("adab_add_bazm_post", { p_bazm_id: bazmId, p_content: textarea.value });
             textarea.value = "";
             await renderPosts(bazmId);
           } catch (e) {
@@ -267,6 +345,10 @@ async function mountBazmDirectory(containerId) {
       const desc = document.getElementById("bd-create-desc").value.trim();
       const errEl = document.getElementById("bd-create-error");
       errEl.innerHTML = "";
+      if (identity.mode !== "google") {
+        errEl.innerHTML = `<div class="bazm-error">${t.bazmErr_default}</div>`;
+        return;
+      }
       try {
         await AdabAuth.rpc("adab_create_bazm", { p_name: name, p_name_urdu: null, p_name_hindi: null, p_description: desc });
         render();

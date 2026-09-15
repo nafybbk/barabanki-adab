@@ -53,6 +53,12 @@ const UI_STRINGS = {
     bazmErr_MEMBER_NAHI: "Join this Bazm first to post",
     bazmCompleteProfileBanner: "Complete your profile so other members know who you are.",
     bazmCompleteProfileBtn: "Complete profile", bazmSignedInAs: "Signed in as",
+    bazmOrPinLogin: "Or sign in with your email + PIN", bazmEmailPh: "Your email",
+    bazmPinPh: "PIN (4-6 digits)", bazmPinLoginBtn: "Sign in",
+    bazmSetPinHeading: "Quick-access PIN (optional)",
+    bazmSetPinNote: "Set a PIN so you can sign in on any device with just your email and PIN — useful for showing your account on someone else's phone. Use it at your own discretion, and sign out when done.",
+    bazmSetPinBtn: "Save PIN", bazmPinModeNote: "(PIN sign-in)",
+    bazmErr_LOGIN_GHALAT: "Email or PIN is not correct", bazmErr_PIN_GHALAT: "PIN must be 4-6 digits",
   },
   hi: {
     home: "मुख्य पृष्ठ", books: "किताबें", poetry: "शायरी संग्रह", shagird: "शागिर्द मंडली",
@@ -98,6 +104,12 @@ const UI_STRINGS = {
     bazmErr_MEMBER_NAHI: "पोस्ट करने के लिए पहले इस बज़्म में शामिल हों",
     bazmCompleteProfileBanner: "अपनी प्रोफ़ाइल पूरी करें ताकि बाकी सदस्य आपको पहचान सकें।",
     bazmCompleteProfileBtn: "प्रोफ़ाइल पूरी करें", bazmSignedInAs: "लॉगिन है",
+    bazmOrPinLogin: "या अपने ईमेल + पिन से लॉगिन करें", bazmEmailPh: "आपका ईमेल",
+    bazmPinPh: "पिन (4-6 अंक)", bazmPinLoginBtn: "लॉगिन करें",
+    bazmSetPinHeading: "क्विक-एक्सेस पिन (वैकल्पिक)",
+    bazmSetPinNote: "एक पिन सेट करें ताकि किसी भी डिवाइस पर सिर्फ़ ईमेल और पिन से लॉगिन हो सके — किसी और के फ़ोन पर अपना अकाउंट दिखाने के लिए काम आता है। यह अपनी समझ से इस्तेमाल करें, और काम होने पर लॉगआउट कर दें।",
+    bazmSetPinBtn: "पिन सेव करें", bazmPinModeNote: "(पिन लॉगिन)",
+    bazmErr_LOGIN_GHALAT: "ईमेल या पिन सही नहीं है", bazmErr_PIN_GHALAT: "पिन 4-6 अंकों का होना चाहिए",
   },
   ur: {
     home: "صفحہ اول", books: "کتابیں", poetry: "شاعری آرکائیو", shagird: "شاگرد حلقہ",
@@ -143,6 +155,12 @@ const UI_STRINGS = {
     bazmErr_MEMBER_NAHI: "پوسٹ کرنے کے لیے پہلے اس بزم میں شامل ہوں",
     bazmCompleteProfileBanner: "اپنی پروفائل مکمل کریں تاکہ باقی ارکان آپ کو پہچان سکیں۔",
     bazmCompleteProfileBtn: "پروفائل مکمل کریں", bazmSignedInAs: "لاگ ان ہے",
+    bazmOrPinLogin: "یا اپنی ای میل + پن سے لاگ ان کریں", bazmEmailPh: "آپ کی ای میل",
+    bazmPinPh: "پن (٤ سے ٦ ہندسے)", bazmPinLoginBtn: "لاگ ان کریں",
+    bazmSetPinHeading: "کوئیک ایکسیس پن (اختیاری)",
+    bazmSetPinNote: "ایک پن سیٹ کریں تاکہ کسی بھی ڈیوائس پر صرف ای میل اور پن سے لاگ ان ہو سکے — کسی اور کے فون پر اپنا اکاؤنٹ دکھانے کے لیے مفید ہے۔ یہ اپنی سمجھ سے استعمال کریں، اور کام ہونے پر لاگ آؤٹ کر دیں۔",
+    bazmSetPinBtn: "پن محفوظ کریں", bazmPinModeNote: "(پن لاگ ان)",
+    bazmErr_LOGIN_GHALAT: "ای میل یا پن درست نہیں ہے", bazmErr_PIN_GHALAT: "پن ٤ سے ٦ ہندسوں کا ہونا چاہیے",
   },
 };
 

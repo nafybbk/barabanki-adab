@@ -84,6 +84,19 @@ const AdabAuth = {
 
   logout() { this.clearSession(); },
 
+  // Anon-key RPC — for RPCs designed to be called by anyone (they check
+  // identity via their own params, e.g. the PIN-login family below).
+  async _rpcAnon(fn, body) {
+    const res = await fetch(`${ADAB_SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: ADAB_ANON_KEY, Authorization: `Bearer ${ADAB_ANON_KEY}` },
+      body: JSON.stringify(body || {}),
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw new Error((data && data.message) || "REQUEST_FAILED");
+    return data;
+  },
+
   // Authenticated RPC — Bearer = the user's own session token.
   async rpc(fn, body) {
     const s = await this.refreshIfNeeded();
@@ -118,6 +131,39 @@ const AdabAuth = {
     const data = await res.json().catch(() => null);
     if (!res.ok) throw new Error((data && data.message) || "REQUEST_FAILED");
     return data;
+  },
+};
+
+// PIN LOGIN — a deliberately weaker, OPT-IN convenience login for using
+// your already-Google-verified account on a device that isn't yours
+// (e.g. showing your Bazm posts on a friend's phone). Google Sign-In is
+// still what proves you're a real person and is required once to set a
+// PIN in the first place; every PIN-mode write below re-checks
+// email+pin server-side on every call (client never proves anything by
+// itself), same trust pattern as the site's older name+PIN system.
+const AdabPinAuth = {
+  KEY: "adab_pin_session",
+
+  getSession() {
+    try { return JSON.parse(localStorage.getItem(this.KEY) || "null"); } catch { return null; }
+  },
+  setSession(s) { localStorage.setItem(this.KEY, JSON.stringify(s)); },
+  logout() { localStorage.removeItem(this.KEY); },
+  isLoggedIn() { return !!this.getSession(); },
+
+  async login(email, pin) {
+    const rows = await AdabAuth._rpcAnon("adab_pin_login", { p_email: email, p_pin: pin });
+    const row = rows[0];
+    const session = { email, pin, user_id: row.user_id, name: row.name };
+    this.setSession(session);
+    return session;
+  },
+
+  // Calls a `_pin` RPC variant, auto-injecting the stored email/pin.
+  async rpc(fn, extraParams) {
+    const s = this.getSession();
+    if (!s) throw new Error("NOT_LOGGED_IN");
+    return AdabAuth._rpcAnon(fn, { p_email: s.email, p_pin: s.pin, ...extraParams });
   },
 };
 

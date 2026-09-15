@@ -11,7 +11,10 @@
 const UI_STRINGS = {
   en: {
     home: "Home", books: "Books", poetry: "Poetry Archive", shagird: "Shagird Circle",
-    bazm: "Bazm-e-Aziz", city: "Barabanki Guide", gallery: "Gallery", apps: "Apps",
+    bazm: "Bazm-e-Aziz", city: "Barabanki Guide", gallery: "Gallery", apps: "Apps", poets: "Poets",
+    poetsFahrisht: "Poets of Barabanki", poetsEyebrow: "The Poets", ustadBadge: "Ustad Shayer",
+    poetsIntro: "Barabanki's known and forgotten poets, in one place.",
+    poetProfile: "Profile", moreComingSoon: "More poets will be added here over time.",
     readBooks: "Read Books", searchPoetry: "Search Poetry",
     aboutTitle: "About", joinBazm: "Join Bazm-e-Aziz",
     footerTagline: "Preserving verse, discipleship, and the spirit of Barabanki.",
@@ -33,7 +36,10 @@ const UI_STRINGS = {
   },
   hi: {
     home: "मुख्य पृष्ठ", books: "किताबें", poetry: "शायरी संग्रह", shagird: "शागिर्द मंडली",
-    bazm: "बज़्म-ए-अज़ीज़", city: "बाराबंकी गाइड", gallery: "गैलरी", apps: "ऐप्स",
+    bazm: "बज़्म-ए-अज़ीज़", city: "बाराबंकी गाइड", gallery: "गैलरी", apps: "ऐप्स", poets: "शायर",
+    poetsFahrisht: "बाराबंकी के शायर", poetsEyebrow: "शायर", ustadBadge: "उस्ताद शायर",
+    poetsIntro: "बाराबंकी के जाने-पहचाने और गुमशुदा शायर, एक ही जगह।",
+    poetProfile: "परिचय", moreComingSoon: "यहाँ आगे और शायर जोड़े जाएँगे।",
     readBooks: "किताबें पढ़ें", searchPoetry: "शायरी खोजें",
     aboutTitle: "परिचय", joinBazm: "बज़्म-ए-अज़ीज़ में शामिल हों",
     footerTagline: "शायरी, शागिर्दी और बाराबंकी की रूह को महफ़ूज़ रखने की एक कोशिश।",
@@ -55,7 +61,10 @@ const UI_STRINGS = {
   },
   ur: {
     home: "صفحہ اول", books: "کتابیں", poetry: "شاعری آرکائیو", shagird: "شاگرد حلقہ",
-    bazm: "بزم عزیز", city: "بارہ بنکی گائیڈ", gallery: "گیلری", apps: "ایپس",
+    bazm: "بزم عزیز", city: "بارہ بنکی گائیڈ", gallery: "گیلری", apps: "ایپس", poets: "شعرا",
+    poetsFahrisht: "بارہ بنکی کے شعرا", poetsEyebrow: "شعرا", ustadBadge: "استاد شاعر",
+    poetsIntro: "بارہ بنکی کے معروف اور گمشدہ شعرا، ایک ہی جگہ۔",
+    poetProfile: "تعارف", moreComingSoon: "یہاں آگے اور شعرا شامل کیے جائیں گے۔",
     readBooks: "کتابیں پڑھیں", searchPoetry: "شاعری تلاش کریں",
     aboutTitle: "تعارف", joinBazm: "بزم عزیز میں شامل ہوں",
     footerTagline: "شاعری، شاگردی اور بارہ بنکی کی روح کو محفوظ رکھنے کی ایک کوشش۔",

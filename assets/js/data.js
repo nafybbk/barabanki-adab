@@ -29,6 +29,7 @@ const SITE_DATA_DEFAULT = {
     में शिरकत की, और उनके कलाम का मिज़ाज क्या रहा।`,
     photo: "assets/img/poet-portrait.jpg",
     years: "",
+    isUstad: true,
   },
 
   ustad: {
@@ -135,9 +136,18 @@ const SITE_DATA_DEFAULT = {
     तीनों में अपना किरदार अदा किया।`,
   },
 
+  // Shairon ki Fahrisht — shayer poet ke saath render hote hain. Har naya
+  // shayer isi shape mein yahan jode: id, naam (3 zabaanon mein), saal,
+  // aur intro (3 zabaanon mein). photo/bio abhi khaali chod sakte hain.
   poets: [
-    { name: "Khumar Barabankvi", nameUrdu: "خمار بارہ بنکوی", nameHindi: "ख़ुमार बाराबंकवी", years: "1919 – 1999", intro: "Khumar Barabankvi Urdu adab ke un chand shayeron mein se hain jinhone ghazal ko naya rang diya. Barabanki unki janm-bhoomi hai." },
-    { name: "Aur Shayer", nameUrdu: "اور شاعر", nameHindi: "और शायर", years: "—", intro: "Barabanki se taalluq rakhne wale doosre shayeron ka zikr yahan." },
+    {
+      id: "khumar-barabankvi",
+      name: "Khumar Barabankvi", nameUrdu: "خمار بارہ بنکوی", nameHindi: "ख़ुमार बाराबंकवी",
+      years: "1919 – 1999",
+      intro: "Khumar Barabankvi Urdu adab ke un chand shayeron mein se hain jinhone ghazal ko naya rang diya. Barabanki unki janm-bhoomi hai.",
+      introUrdu: "خمار بارہ بنکوی اردو ادب کے ان چند شاعروں میں سے ہیں جنہوں نے غزل کو نیا رنگ دیا۔ بارہ بنکی ان کی جنم بھومی ہے۔",
+      introHindi: "ख़ुमार बाराबंकवी उर्दू अदब के उन चंद शायरों में से हैं जिन्होंने ग़ज़ल को नया रंग दिया। बाराबंकी उनकी जन्मभूमि है।",
+    },
   ],
 
   dargah: [

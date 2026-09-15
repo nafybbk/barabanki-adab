@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shairon ki Fahrisht</title>
+<meta name="description" content="Barabanki ke maroof aur gumshuda shairon ki fahrisht.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,500;1,400&family=Noto+Naskh+Arabic:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body data-page="poets">
+<div class="grain"></div>
+<div id="site-header"></div>
+
+<section class="section" style="padding-bottom:20px;">
+  <a href="../index.html" class="btn btn-ghost" style="margin-bottom:20px;"><span class="dir-arrow">←</span> <span data-ui="home"></span></a>
+  <div class="eyebrow" data-ui="poetsEyebrow"></div>
+  <h1 style="font-size:40px; margin-bottom:14px;" data-ui="poetsFahrisht"></h1>
+  <p class="muted" style="max-width:60ch;" data-ui="poetsIntro"></p>
+</section>
+
+<section class="section section-tight" style="padding-top:0;">
+  <div id="ustad-card"></div>
+</section>
+
+<div class="divider"></div>
+
+<section class="section section-tight" style="padding-top:0;">
+  <div id="poets-grid" class="grid-2" style="gap:20px;"></div>
+  <p class="muted center" style="margin-top:30px; font-size:14px;" data-ui="moreComingSoon"></p>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="../assets/js/data.js?v=9"></script>
+<script src="../assets/js/chrome.js?v=9"></script>
+<script src="../assets/js/i18n.js?v=9"></script>
+<script>
+  const { poet, poets } = SITE_DATA;
+
+  window.renderPageContent = function (lang) {
+    const introF = fieldForLang("intro", lang);
+    const t = UI_STRINGS[lang] || UI_STRINGS.en;
+
+    document.getElementById("ustad-card").innerHTML = `
+      <a href="../index.html#taaruf" class="card" style="display:flex; gap:20px; align-items:center; flex-wrap:wrap; padding:28px;">
+        <div style="width:88px; height:88px; border-radius:50%; overflow:hidden; flex-shrink:0; background:var(--maroon);">
+          <img src="../${poet.photo}" alt="${poet.name}" style="width:100%; height:100%; object-fit:cover;"
+               onerror="this.remove();">
+        </div>
+        <div style="flex:1; min-width:200px;">
+          <span class="pill" style="background:var(--gold); color:var(--maroon-deep); margin-bottom:8px; display:inline-block;">${t.ustadBadge}</span>
+          <div class="h-urdu" style="font-size:24px; margin-top:4px;">${poet.nameUrdu}</div>
+          <div class="muted" style="font-size:15px;">${poet.name}</div>
+        </div>
+      </a>`;
+
+    document.getElementById("poets-grid").innerHTML = (poets || []).map(p => `
+      <div class="card">
+        <div class="h-urdu" style="font-size:20px; margin-bottom:6px;">${p.nameUrdu}</div>
+        <div class="muted" style="font-size:14px; margin-bottom:10px;">${p.name}${p.years ? " · " + p.years : ""}</div>
+        <p class="muted" style="font-size:14px; line-height:1.8;">${p[introF] || p.intro}</p>
+      </div>`).join("");
+  };
+  window.renderPageContent(LangStore.get());
+</script>
+</body>
+</html>
